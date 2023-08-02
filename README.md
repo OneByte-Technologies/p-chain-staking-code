@@ -1,4 +1,4 @@
-# Flare P-chain Staking Tool
+# Test Flare P-chain Staking Tool
 
 This repo contains a tool for staking assets.
 
