@@ -1,6 +1,6 @@
 import { Command, OptionValues } from 'commander'
 import { UnsignedTxJson, SignedTxJson, Context, ContextFile, FlareTxParams } from './interfaces'
-import { contextEnv, contextFile, getContext } from './constants'
+import { contextEnv, contextFile, getContext, networkFromContextFile } from './constants'
 import {
   compressPublicKey, integerToDecimal, decimalToInteger, readSignedTxJson,
   saveUnsignedTxJson, toBN, initCtxJson, publicKeyToEthereumAddressString,
@@ -15,6 +15,7 @@ import { ledgerSign, signId } from './ledger/sign'
 import { getSignature, sendToForDefi } from './forDefi'
 import { createWithdrawalTransaction, sendSignedWithdrawalTransaction } from './withdrawal'
 import { log, logError, logInfo, logSuccess } from './output'
+import { colorCodes } from "./constants"
 
 const DERIVATION_PATH = "m/44'/60'/0'/0/0" // derivation path for ledger
 const FLR = 1e9 // one FLR in nanoFLR
@@ -23,7 +24,7 @@ const MAX_TRANSCTION_FEE = FLR
 export async function cli(program: Command) {
   // global configurations
   program
-    .option("--network <network>", "Network name (flare or costwo)", 'flare')
+    .option("--network <network>", "Network name (flare or costwo)")
     .option("--ledger", "Use ledger to sign transactions")
     .option("--blind", "Blind signing (used for ledger)", false)
     .option("--get-hacked", "Use the .env file with the exposed private key")
@@ -74,9 +75,7 @@ export async function cli(program: Command) {
       const ctx = await contextFromOptions(options)
       if (options.getHacked) {
         // this is more of a concept for future development, by now private key was already exposed to dependencies
-        const response = await getUserInput(`
-          You are about to expose your private key to 800+ dependencies, and we cannot guarantee one of them is not malicious!
-          This command is not meant to be used in production, but for testing only! Proceed? (Y/N) `)
+        const response = await getUserInput(`${colorCodes.redColor}Warning: You are about to expose your private key to 800+ dependencies, and we cannot guarantee one of them is not malicious! \nThis command is not meant to be used in production, but for testing only!${colorCodes.resetColor} \nProceed? (Y/N) `)
         if (response == 'Y') await cliBuildAndSendTxUsingPrivateKey(type, ctx, options as FlareTxParams)
       } else if (options.ledger) {
         await cliBuildAndSendTxUsingLedger(type, ctx, options as FlareTxParams, options.blind)
@@ -117,21 +116,21 @@ export async function cli(program: Command) {
     })
   // withdrawal from c-chain
   program
-  .command("withdrawal").description("Withdraw funds from c-chain")
-  .option("-i, --transaction-id <transaction-id>", "Id of the transaction to finalize")
-  .option("-a, --amount <amount>", "Amount to transfer")
-  .option("-t, --to <to>", "Address to send funds to")
-  .option("--nonce <nonce>", "Nonce of the constructed transaction")
-  .option("--send-signed-tx", "Send signed transaction json to the node")
-  .action(async (options: OptionValues) => {
-    options = getOptions(program, options)
-    const ctx = await contextFromOptions(options)
-    if (options.sendSignedTx) {
-      await withdraw_useSignature(ctx, options.transactionId)
-    } else { // create unsigned transaction
-      await withdraw_getHash(ctx, options.to, options.amount, options.transactionId, options.nonce)
-    }
-  })
+    .command("withdrawal").description("Withdraw funds from c-chain")
+    .option("-i, --transaction-id <transaction-id>", "Id of the transaction to finalize")
+    .option("-a, --amount <amount>", "Amount to transfer")
+    .option("-t, --to <to>", "Address to send funds to")
+    .option("--nonce <nonce>", "Nonce of the constructed transaction")
+    .option("--send-signed-tx", "Send signed transaction json to the node")
+    .action(async (options: OptionValues) => {
+      options = getOptions(program, options)
+      const ctx = await contextFromOptions(options)
+      if (options.sendSignedTx) {
+        await withdraw_useSignature(ctx, options.transactionId)
+      } else { // create unsigned transaction
+        await withdraw_getHash(ctx, options.to, options.amount, options.transactionId, options.nonce)
+      }
+    })
   // ledger two-step manual signing
   program
     .command("sign-hash").description("Sign a transaction hash (blind signing)")
@@ -162,8 +161,24 @@ async function contextFromOptions(options: OptionValues): Promise<Context> {
   }
 }
 
+// Network is obtained from context file, if it exists, else from --network flag.
+// This is because ledger does not need a context file
+function networkFromOptions(options: OptionValues): string {
+  let network = options.network
+  if (network == undefined) {
+    try {
+      network = networkFromContextFile(options.ctxFile)
+    } catch (e) {
+      network = "flare"
+    }
+  }
+  logInfo(`Using network: ${network}`)
+  return network
+}
+
 function getOptions(program: Command, options: OptionValues): OptionValues {
   const allOptions: OptionValues = { ...program.opts(), ...options }
+  const network = networkFromOptions(allOptions)
   // amount and fee are given in FLR, transform into nanoFLR (FLR = 1e9 nanoFLR)
   if (allOptions.amount) {
     allOptions.amount = decimalToInteger(allOptions.amount.replace(/,/g, ''), 9)
@@ -171,14 +186,14 @@ function getOptions(program: Command, options: OptionValues): OptionValues {
   if (allOptions.fee) {
     allOptions.fee = decimalToInteger(allOptions.fee, 9)
   }
-  return allOptions
+  return { ...allOptions, network }
 }
 
 function capFeeAt(cap: number, usedFee?: string, specifiedFee?: string): void {
   if (usedFee !== specifiedFee) { // if usedFee was that specified by the user, we don't cap it
     const usedFeeNumber = Number(usedFee) // if one of the fees is defined, usedFee is defined
     if (usedFeeNumber > cap)
-     throw new Error(`Used fee of ${usedFeeNumber / FLR} FLR is higher than the maximum allowed fee of ${cap / FLR} FLR`)
+      throw new Error(`Used fee of ${usedFeeNumber / FLR} FLR is higher than the maximum allowed fee of ${cap / FLR} FLR`)
     logInfo(`Using fee of ${usedFeeNumber / FLR} FLR`)
   }
 }
@@ -298,8 +313,8 @@ async function logBalanceInfo(ctx: Context) {
   cbalance = integerToDecimal(cbalance, 18)
   pbalance = integerToDecimal(pbalance, 9)
   logInfo(`Balances on the network "${ctx.config.hrp}"`)
-  log(`C-chain ${ctx.cAddressHex}: ${cbalance}`)
-  log(`P-chain ${ctx.pAddressBech32}: ${pbalance}`)
+  log(`C-chain ${ctx.cAddressHex}: ${cbalance} FLR`)
+  log(`P-chain ${ctx.pAddressBech32}: ${pbalance} FLR`)
 }
 
 function logNetworkInfo(ctx: Context) {
