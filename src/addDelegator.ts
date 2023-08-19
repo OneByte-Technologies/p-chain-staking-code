@@ -59,7 +59,7 @@ export async function getUnsignedAddDelegator(
   }
 }
 
-async function getAddDelegatorParams(
+export async function getAddDelegatorParams(
   ctx: Context,
   nodeID: string,
   stakeAmount: BN,
