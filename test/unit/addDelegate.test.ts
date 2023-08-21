@@ -1,7 +1,7 @@
 import { getAddDelegatorParams, getUnsignedAddDelegator } from '../../src/addDelegator';
 import { contextEnv } from '../../src/constants';
 import { Context } from '../../src/interfaces';
-import fixtures from '../fixtures/addDelegateData';
+import fixtures from '../fixtures/addDelegate.data';
 describe('addDelegate Testcases', () => {
   describe('getAddDelegatorParams Testcases [.env]', () => {
     let ctx: Context = contextEnv('.env', 'localflare');

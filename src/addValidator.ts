@@ -63,7 +63,7 @@ export async function getUnsignedAddValidator(
   }
 }
 
-async function getAddValidatorParams(
+export async function getAddValidatorParams(
   ctx: Context,
   nodeID: string,
   stakeAmount: BN,
