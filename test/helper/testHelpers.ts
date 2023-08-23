@@ -1,4 +1,6 @@
 import { BN } from '@flarenetwork/flarejs/dist';
+import { exportTxCP } from '../../src/evmAtomicTx';
+import { contextEnv } from '../../src/constants';
 export const serialize = (bufferData: Buffer[]) => {
   const serializedData = JSON.stringify(bufferData, (key, value) => {
     if (Buffer.isBuffer(value)) {
@@ -32,4 +34,13 @@ export const compareValues = (a: any, b: any): boolean => {
     return true;
   }
   return a === b;
+};
+
+export const tranferFundsFromCtoP = async () => {
+  try {
+    let ctx = contextEnv('.env', 'localflare');
+    await exportTxCP(ctx, new BN(100000));
+  } catch (error) {
+    console.log(error);
+  }
 };

@@ -12,7 +12,7 @@ import {
   decodePublicKey
 } from './utils'
 
-function readContextFile(ctxFile: string): ContextFile {
+export function readContextFile(ctxFile: string): ContextFile {
   const file = fs.readFileSync(ctxFile, 'utf8')
   return JSON.parse(file) as ContextFile
 }
@@ -59,7 +59,7 @@ export function getContext(network: string, publicKey?: string, privateKeyHex?: 
   return context(getConfig(network), publicKey, privateKeyHex, privateKeyCB58)
 }
 
-function getConfig(network: string): NetworkConfig {
+export function getConfig(network: string | undefined): NetworkConfig {
   let networkConfig
   if (network == 'flare' || network === undefined) {
     networkConfig = flare
@@ -71,7 +71,7 @@ function getConfig(network: string): NetworkConfig {
   return networkConfig
 }
 
-function context(
+export function context(
   config: NetworkConfig,
   publicKey?: string, privkHex?: string, privkCB58?: string,
 ): Context {

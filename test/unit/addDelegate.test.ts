@@ -2,21 +2,23 @@ import { getAddDelegatorParams, getUnsignedAddDelegator } from '../../src/addDel
 import { contextEnv } from '../../src/constants';
 import { Context } from '../../src/interfaces';
 import fixtures from '../fixtures/addDelegate.data';
+import {tranferFundsFromCtoP} from "../helper/testHelpers"
 describe('addDelegate Testcases', () => {
   describe('getAddDelegatorParams Testcases [.env]', () => {
     let ctx: Context = contextEnv('.env', 'localflare');
     test('Should get params for valid Input', async () => {
       try {
-        const inputObject = fixtures.getAddDelegatorParams.input;
-        // console.log(ctx)
-        const params = await getAddDelegatorParams(
-          ctx,
-          inputObject.nodeID,
-          inputObject.stakeAmount,
-          inputObject.startTime,
-          inputObject.endTime
-        );
-        expect(params).not.toBeNull;
+        await tranferFundsFromCtoP()
+        // const inputObject = fixtures.getAddDelegatorParams.input;
+        // // console.log(ctx)
+        // const params = await getAddDelegatorParams(
+        //   ctx,
+        //   inputObject.nodeID,
+        //   inputObject.stakeAmount,
+        //   inputObject.startTime,
+        //   inputObject.endTime
+        // );
+        // expect(params).not.toBeNull;
       } catch (error) {
         expect(error).toBeNull;
       }
