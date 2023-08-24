@@ -8,17 +8,16 @@ describe('addDelegate Testcases', () => {
     let ctx: Context = contextEnv('.env', 'localflare');
     test('Should get params for valid Input', async () => {
       try {
-        await tranferFundsFromCtoP()
-        // const inputObject = fixtures.getAddDelegatorParams.input;
-        // // console.log(ctx)
-        // const params = await getAddDelegatorParams(
-        //   ctx,
-        //   inputObject.nodeID,
-        //   inputObject.stakeAmount,
-        //   inputObject.startTime,
-        //   inputObject.endTime
-        // );
-        // expect(params).not.toBeNull;
+        const inputObject = fixtures.getAddDelegatorParams.input;
+        // console.log(ctx)
+        const params = await getAddDelegatorParams(
+          ctx,
+          inputObject.nodeID,
+          inputObject.stakeAmount,
+          inputObject.startTime,
+          inputObject.endTime
+        );
+        expect(params).not.toBeNull;
       } catch (error) {
         expect(error).toBeNull;
       }
