@@ -116,8 +116,9 @@ export function context(
   const iport = port ? `${ip}:${port}` : `${ip}`
   const rpcurl = `${protocol}://${iport}`
   const web3 = new Web3(`${rpcurl}${path}`)
-
-  const avalanche = new Avalanche(ip, port, protocol, networkID)
+  console.log(ip)
+  console.log(networkID)
+  const avalanche = new Avalanche(ip, port, protocol, networkID,)
   const cchain: EVMAPI = avalanche.CChain()
   const pchain: PVMAPI = avalanche.PChain()
   const cKeychain: EVMKeyChain = cchain.keyChain()
