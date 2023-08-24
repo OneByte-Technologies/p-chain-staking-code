@@ -45,7 +45,18 @@ export const prompts = {
             {
                 type: 'input',
                 name: 'amount',
-                message: `${colorCodes.magentaColor}Enter amount to move ${colorCodes.yellowColor}(in FLR)${colorCodes.magentaColor}:${colorCodes.resetColor}`,
+                message: `${colorCodes.magentaColor}Enter amount ${colorCodes.yellowColor}(in FLR)${colorCodes.magentaColor}:${colorCodes.resetColor}`,
+            },
+        ];
+        return inquirer.prompt(questions);
+    },
+
+    NodeId: async () => {
+        const questions = [
+            {
+                type: 'input',
+                name: 'id',
+                message: `${colorCodes.magentaColor}Enter Node NodeId ${colorCodes.yellowColor}(E.g. NodeID-FQKTLuZHEsjCxPeFTFgsojsucmdyNDsz1)${colorCodes.magentaColor}:${colorCodes.resetColor}`,
             },
         ];
         return inquirer.prompt(questions);
@@ -76,10 +87,9 @@ export const prompts = {
                 name: 'network',
                 message: `${colorCodes.magentaColor}Which network do you want to connect to?${colorCodes.resetColor}`,
                 choices: [`Flare ${colorCodes.greenColor}(Mainnet)`, `Coston2 ${colorCodes.yellowColor}(Testnet)`],
-                filter: function (val: string) {
+                filter: (val: string) => {
                     const network = val.split(" ")[0]
-                    if (network == "flare") { return "flare" }
-                    else return "costwo"
+                    return network == "flare"? "flare" : "costwo"
                 }
             },
         ];

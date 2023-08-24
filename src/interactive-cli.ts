@@ -38,7 +38,18 @@ export async function interactiveCli(baseargv: string[]) {
             await program.parseAsync(argsImport)
         }
         else {
-            console.log("only pvt key supported right now")
+            console.log("only pvt key supported for txns right now")
+        }
+    }
+    else if (Object.keys(screenConstants)[7] == task.toString()) {
+        if (walletProperties.wallet.includes("Private Key") && walletProperties.network && walletProperties.path) {
+            const amount = await prompts.amount()
+            const nodeId = await prompts.NodeId()
+            const argsExport = [...baseargv.slice(0, 2), "transaction", screenConstants[task], '-a', `${amount.amount}`, `--env-path=${walletProperties.path}`, `--network=${walletProperties.network}`, "--get-hacked"]
+            await program.parseAsync(argsExport)
+        }
+        else {
+            console.log("only pvt key supported for delegation right now")
         }
     }
     else {
