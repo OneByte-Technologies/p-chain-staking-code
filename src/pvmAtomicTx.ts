@@ -83,7 +83,7 @@ export async function issueSignedPvmTx(ctx: Context, signedTxJson: SignedTxJson)
   return { chainTxId: chainTxId }
 }
 
-async function getImportCPParams(ctx: Context, threshold: number = 1): Promise<ImportCPParams> {
+export async function getImportCPParams(ctx: Context, threshold: number = 1): Promise<ImportCPParams> {
   const locktime: BN = new BN(0)
   const asOf: BN = UnixNow()
   const platformVMUTXOResponse: any = await ctx.pchain.getUTXOs(
@@ -105,7 +105,7 @@ async function getImportCPParams(ctx: Context, threshold: number = 1): Promise<I
   ]
 }
 
-async function getExportPCParams(ctx: Context, amount?: BN, threshold: number = 1): Promise<ExportPCParams> {
+export async function getExportPCParams(ctx: Context, amount?: BN, threshold: number = 1): Promise<ExportPCParams> {
   const locktime: BN = new BN(0)
   const asOf: BN = UnixNow()
   const platformVMUTXOResponse: any = await ctx.pchain.getUTXOs([ctx.pAddressBech32!])
