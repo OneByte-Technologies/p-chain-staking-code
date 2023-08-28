@@ -44,8 +44,9 @@ export async function interactiveCli(baseargv: string[]) {
     else if (Object.keys(screenConstants)[7] == task.toString()) {
         if (walletProperties.wallet.includes("Private Key") && walletProperties.network && walletProperties.path) {
             const amount = await prompts.amount()
-            const nodeId = await prompts.NodeId()
-            const argsExport = [...baseargv.slice(0, 2), "transaction", screenConstants[task], '-a', `${amount.amount}`, `--env-path=${walletProperties.path}`, `--network=${walletProperties.network}`, "--get-hacked"]
+            const nodeId = await prompts.nodeId()
+            const { startTime, endTime } = await getDuration()
+            const argsExport = [...baseargv.slice(0, 2), "transaction", screenConstants[task], '-n', `${nodeId.id}`, `--network=${walletProperties.network}`, '-a', `${amount.amount}`, '-s', `${startTime}`, '-e', `${endTime}`, `--env-path=${walletProperties.path}`, "--get-hacked"]
             await program.parseAsync(argsExport)
         }
         else {
@@ -73,7 +74,7 @@ async function connectWallet(): Promise<connectWalletInterface> {
 
         if (isFileExist) {
             console.log(`${colorCodes.magentaColor}You already have an existing Ctx file with the following parameters - ${colorCodes.resetColor}`)
-            const { network : ctxNetwork, publicKey : ctxPublicKey} = readInfoFromCtx("ctx.json")
+            const { network: ctxNetwork, publicKey: ctxPublicKey } = readInfoFromCtx("ctx.json")
             console.log(`${colorCodes.orangeColor}Public Key:${colorCodes.resetColor} ${ctxPublicKey}`)
             console.log(`${colorCodes.orangeColor}Network:${colorCodes.resetColor} ${ctxNetwork}`)
             const getUserChoice = await prompts.ctxFile();
@@ -121,6 +122,15 @@ function fileExists(filePath: string): Boolean {
         return true;
     } catch (error) {
         return false;
+    }
+}
+
+async function getDuration(): Promise<{ startTime: string, endTime: string }> {
+    const startTime = await prompts.unixTime("start")
+    const endTime = await prompts.unixTime("end")
+    return {
+        startTime: startTime.time,
+        endTime: endTime.time
     }
 }
 

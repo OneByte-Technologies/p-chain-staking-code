@@ -51,12 +51,23 @@ export const prompts = {
         return inquirer.prompt(questions);
     },
 
-    NodeId: async () => {
+    nodeId: async () => {
         const questions = [
             {
                 type: 'input',
                 name: 'id',
                 message: `${colorCodes.magentaColor}Enter Node NodeId ${colorCodes.yellowColor}(E.g. NodeID-FQKTLuZHEsjCxPeFTFgsojsucmdyNDsz1)${colorCodes.magentaColor}:${colorCodes.resetColor}`,
+            },
+        ];
+        return inquirer.prompt(questions);
+    },
+
+    unixTime: async (timeType:string) => {
+        const questions = [
+            {
+                type: 'input',
+                name: 'time',
+                message: `${colorCodes.magentaColor}Enter ${timeType} time${colorCodes.yellowColor}(E.g. 1693185095)${colorCodes.magentaColor}:${colorCodes.resetColor}`,
             },
         ];
         return inquirer.prompt(questions);

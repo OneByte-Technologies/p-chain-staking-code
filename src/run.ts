@@ -26,7 +26,6 @@ function getArgv() {
         command === 'stake' ||
         command === 'delegate'
     ) {
-        console.log([...baseArgv.slice(0, 2), 'transaction', ...baseArgv.slice(2)])
         return [...baseArgv.slice(0, 2), 'transaction', ...baseArgv.slice(2)]
     } else if (
         command === 'addresses' ||
