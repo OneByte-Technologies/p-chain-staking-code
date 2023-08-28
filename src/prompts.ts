@@ -120,4 +120,24 @@ export const prompts = {
         ];
         return inquirer.prompt(questions);
     },
+
+    selectAddress: async (choiceList:string[]) => {
+        const questions = [
+            {
+                type: 'list',
+                name: 'address',
+                message: `${colorCodes.magentaColor}Which address do you want to use?${colorCodes.resetColor}`,
+                choices: [
+                    ...choiceList
+                ],
+                filter: (val: string) => {
+                    const address = val.split(" ")[1]
+                    return address
+                }
+            },
+        ];
+        return inquirer.prompt(questions);
+    },
+
+
 };

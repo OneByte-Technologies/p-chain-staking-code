@@ -1,6 +1,8 @@
 import * as ethutil from 'ethereumjs-util'
 import * as elliptic from "elliptic"
 import { bech32 } from 'bech32'
+import { ledgerGetAccount } from './key'
+import { DerivedAddress } from '../interfaces'
 
 //////////////////////////////////////////////////////////////////////////////////////////
 // public keys and bech32 addresses
@@ -132,4 +134,27 @@ export function expandDerivationPath(derivationPath: string) {
 	const accountPath = derivationPath.substring(0, derivationPath.length - 4)
 	const signPath = derivationPath.substring(derivationPath.length - 3)
 	return { accountPath: accountPath, signPath: signPath }
+}
+
+export async function getPathsAndAddresses(network: string): Promise<DerivedAddress[]> {
+  const BASE_PATHS = "m/44'/60'/0'/0/"
+  const PATH_LIST = []
+
+  for (let i = 0; i < 10; i++) {
+    PATH_LIST.push(BASE_PATHS + i.toString())
+  }
+
+  const results: DerivedAddress[] = [];
+
+  for (const path of PATH_LIST) {
+    const { publicKey } = await ledgerGetAccount(path, network)
+    const ethAddress = publicKeyToEthereumAddressString(publicKey)
+    const derivedAddress: DerivedAddress = {
+      ethAddress : ethAddress,
+      derivationPath : path
+    }
+    results.push(derivedAddress)
+  }
+
+  return results
 }

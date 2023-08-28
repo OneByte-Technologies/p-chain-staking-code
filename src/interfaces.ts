@@ -89,3 +89,9 @@ export interface connectWalletInterface {
   network?: string;
   isCreateCtx?: boolean;
 }
+
+export interface DerivedAddress{
+  ethAddress: string,
+  balance?: string,
+  derivationPath : string
+}

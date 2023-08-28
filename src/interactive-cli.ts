@@ -2,8 +2,10 @@ import { prompts } from "./prompts"
 import { screenConstants } from "./screenConstants"
 import { colorCodes } from "./constants"
 import { Command } from 'commander'
-import { cli } from './cli'
+import { cli, initCtxJsonFromOptions } from './cli'
 import { ScreenConstantsInterface, connectWalletInterface, ContextFile } from './interfaces'
+import { getPathsAndAddresses } from './ledger/utils';
+import { DerivedAddress } from './interfaces';
 import fs from 'fs'
 
 export async function interactiveCli(baseargv: string[]) {
@@ -101,6 +103,27 @@ async function connectWallet(): Promise<connectWalletInterface> {
 
         return { wallet, isCreateCtx, publicKey, network }
     }
+    else if (wallet.includes("Ledger")){
+        const network = await selectNetwork()
+
+        console.log("Fetching Addresses...")
+        const pathList: DerivedAddress[] = await getPathsAndAddresses(network)
+        const choiceList = await createChoicesFromAddress(pathList)
+        const selectedAddress = await prompts.selectAddress(choiceList)
+
+        const selectedDerivedAddress = pathList.find(item => item.ethAddress == selectedAddress.address)
+        const selectedDerivationPath = selectedDerivedAddress?.derivationPath
+
+        const optionsObject = {
+            network,
+            blind:false,
+            ctxFile: 'ctx.json',
+            ledger: true
+        }
+        await initCtxJsonFromOptions(optionsObject,selectedDerivationPath)
+
+        return {wallet , network }
+    }
     else {
         return { wallet }
     }
@@ -144,4 +167,15 @@ function readInfoFromCtx(filePath: string): ContextFile {
 
     return { publicKey, network }
 
+}
+
+async function createChoicesFromAddress(pathList : DerivedAddress[]) {
+    const choiceList: string[] = []
+
+    for (let i = 0; i < 10; i++) {
+        const choice = pathList[i].ethAddress
+        choiceList.push(`${i+1}. ${choice}`)
+    }
+
+    return choiceList
 }

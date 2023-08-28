@@ -263,10 +263,10 @@ async function buildAndSendTxUsingPrivateKey(
 //////////////////////////////////////////////////////////////////////////////////////////
 // initializing ctx.json
 
-export async function initCtxJsonFromOptions(options: OptionValues): Promise<void> {
+export async function initCtxJsonFromOptions(options: OptionValues, derivationPath = DERIVATION_PATH): Promise<void> {
   let contextFile: ContextFile
   if (options.ledger) {
-    const { publicKey, address } = await ledgerGetAccount(DERIVATION_PATH, options.network)
+    const { publicKey, address } = await ledgerGetAccount(derivationPath, options.network)
     const ethAddress = publicKeyToEthereumAddressString(publicKey)
     contextFile = { publicKey, ethAddress, flareAddress: address, network: options.network }
   } else if (options.publicKey) {
