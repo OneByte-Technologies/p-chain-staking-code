@@ -21,18 +21,18 @@ describe('cli Testcases', () => {
   });
   describe('networkFromOptions Testcases', () => {
     test('should return flare', () => {
-      const result = networkFromOptions(fixtures.contextFromOptions.flare.input);
-      expect(result).toBe(fixtures.contextFromOptions.flare.output);
+      const result = networkFromOptions(fixtures.networkFromOptions.flare.input);
+      expect(result).toBe(fixtures.networkFromOptions.flare.output);
       expect(logInfo).toHaveBeenCalledWith(
-        `Using network: ${fixtures.contextFromOptions.flare.output}`
+        `Using network: ${fixtures.networkFromOptions.flare.output}`
       );
     });
 
     test('should return flare for null input', () => {
-      const result = networkFromOptions(fixtures.contextFromOptions.null.input);
-      expect(result).toBe(fixtures.contextFromOptions.null.output);
+      const result = networkFromOptions(fixtures.networkFromOptions.null.input);
+      expect(result).toBe(fixtures.networkFromOptions.null.output);
       expect(logInfo).toHaveBeenCalledWith(
-        `Using network: ${fixtures.contextFromOptions.null.output}`
+        `Using network: ${fixtures.networkFromOptions.null.output}`
       );
     });
   });

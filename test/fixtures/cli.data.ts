@@ -1,5 +1,5 @@
 const fixtures = {
-    contextFromOptions: {
+    networkFromOptions: {
         flare: {input:{network: "flare"}, output: "flare"},
         null: {input: {network: null}, output: "flare"}
     },
