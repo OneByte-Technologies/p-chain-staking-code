@@ -19,7 +19,7 @@ export async function interactiveCli(baseargv: string[]) {
         if (walletProperties.wallet.includes("Private Key") && walletProperties.path && walletProperties.network) {
             const args = [...baseargv.slice(0, 2), "info", screenConstants[task], `--env-path=${walletProperties.path}`, `--network=${walletProperties.network}`, "--get-hacked"]
             await program.parseAsync(args)
-        } else if (walletProperties.wallet.includes("Public Key")) {
+        } else if (walletProperties.wallet.includes("Public Key") || walletProperties.wallet.includes("Ledger")) {
             if (walletProperties.isCreateCtx && walletProperties.network && walletProperties.publicKey) {
                 const initArgs = [...baseargv.slice(0, 2), "init-ctx", "-p", walletProperties.publicKey, `--network=${walletProperties.network}`]
                 await program.parseAsync(initArgs)
@@ -122,7 +122,7 @@ async function connectWallet(): Promise<connectWalletInterface> {
         }
         await initCtxJsonFromOptions(optionsObject,selectedDerivationPath)
 
-        return {wallet , network }
+        return {wallet , network, isCreateCtx: false }
     }
     else {
         return { wallet }
@@ -179,3 +179,16 @@ async function createChoicesFromAddress(pathList : DerivedAddress[]) {
 
     return choiceList
 }
+
+
+// async function addBalanceInfo(pathList : DerivedAddress[],network:string) {
+
+//     for ( let path of pathList) {
+//         const ctx = { publicKey : path.publicKey,
+//         network: network}
+//     }
+//     let cbalance = (toBN(await ctx.web3.eth.getBalance(ctx.cAddressHex!)))!.toString()
+//     let pbalance = (toBN((await ctx.pchain.getBalance(ctx.pAddressBech32!)).balance))!.toString()
+//     cbalance = integerToDecimal(cbalance, 18)
+//     pbalance = integerToDecimal(pbalance, 9)
+// }

@@ -92,6 +92,7 @@ export interface connectWalletInterface {
 
 export interface DerivedAddress{
   ethAddress: string,
+  publicKey :string,
   balance?: string,
   derivationPath : string
 }
