@@ -96,7 +96,7 @@ export interface NetworkConstantsInterface {
 }
 
 /**
- * Represents the properties returned from the "connectWallet" function.
+ * Represents the properties returned from the "connectWallet" function
  * @interface ConnectWalletInterface
  */
 export interface ConnectWalletInterface {
