@@ -82,7 +82,7 @@ export interface ScreenConstantsInterface {
   [key: string]: string;
 }
 
-export interface connectWalletInterface {
+export interface ConnectWalletInterface {
   wallet: string;
   path?: string;
   publicKey?: string;

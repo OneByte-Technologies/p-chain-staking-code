@@ -3,13 +3,13 @@ import { screenConstants } from "./screenConstants"
 import { colorCodes } from "./constants"
 import { Command } from 'commander'
 import { cli, initCtxJsonFromOptions } from './cli'
-import { ScreenConstantsInterface, connectWalletInterface, ContextFile } from './interfaces'
+import { ScreenConstantsInterface, ConnectWalletInterface, ContextFile } from './interfaces'
 import { getPathsAndAddresses } from './ledger/utils';
 import { DerivedAddress } from './interfaces';
 import fs from 'fs'
 
 export async function interactiveCli(baseargv: string[]) {
-    const walletProperties: connectWalletInterface = await connectWallet()
+    const walletProperties: ConnectWalletInterface = await connectWallet()
     const task = await selectTask()
 
     const program = new Command("Flare Stake Tool")
@@ -60,7 +60,7 @@ export async function interactiveCli(baseargv: string[]) {
     }
 }
 
-async function connectWallet(): Promise<connectWalletInterface> {
+async function connectWallet(): Promise<ConnectWalletInterface> {
     const walletPrompt = await prompts.connectWallet()
     const wallet = walletPrompt.wallet.split("\\")[0] //removing ANSI color code
     if (wallet.includes("Private Key")) {
