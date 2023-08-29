@@ -59,6 +59,15 @@ export async function getUnsignedAddDelegator(
   }
 }
 
+
+/**
+ * Generate the parameters for getUnsignedAddDelegator and addDelegator
+ * @param ctx - context with constants initialized from user keys
+ * @param nodeID - id of the node you are running (can get it via rpc call)
+ * @param stakeAmount - the amount of funds to stake during the node's validation
+ * @param startTime - start time of the node's validation
+ * @param endTime - end time of the node's validation
+ */
 export async function getAddDelegatorParams(
   ctx: Context,
   nodeID: string,

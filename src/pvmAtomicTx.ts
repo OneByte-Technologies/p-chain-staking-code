@@ -83,6 +83,12 @@ export async function issueSignedPvmTx(ctx: Context, signedTxJson: SignedTxJson)
   return { chainTxId: chainTxId }
 }
 
+/**
+ * Returns the parameters related to importing funds from C to P chain
+ * @param ctx - context file aka ctx.json
+ * @param threshold
+ * @returns the parameters
+ */
 export async function getImportCPParams(ctx: Context, threshold: number = 1): Promise<ImportCPParams> {
   const locktime: BN = new BN(0)
   const asOf: BN = UnixNow()
@@ -105,6 +111,13 @@ export async function getImportCPParams(ctx: Context, threshold: number = 1): Pr
   ]
 }
 
+/**
+ * @description - Returns the parameters that will be used by function to export funds from P to C chain
+ * @param ctx - the context file
+ * @param amount - the amount that needs to be exported from P to C
+ * @param threshold - threshold
+ * @returns
+ */
 export async function getExportPCParams(ctx: Context, amount?: BN, threshold: number = 1): Promise<ExportPCParams> {
   const locktime: BN = new BN(0)
   const asOf: BN = UnixNow()

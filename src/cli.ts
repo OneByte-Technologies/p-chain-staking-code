@@ -163,6 +163,11 @@ async function contextFromOptions(options: OptionValues): Promise<Context> {
 
 // Network is obtained from context file, if it exists, else from --network flag.
 // This is because ledger does not need a context file
+/**
+ * @description Returns the network config from the options that were passed
+ * @param options - contains the options to derive the network
+ * @returns - network
+ */
 export function networkFromOptions(options: OptionValues): string {
   let network = options.network
   if (network == undefined) {
@@ -176,6 +181,11 @@ export function networkFromOptions(options: OptionValues): string {
   return network
 }
 
+/**
+ * @description - Returns the options for a command
+ * @param program - the command
+ * @param options - option available for the command
+ */
 export function getOptions(program: Command, options: OptionValues): OptionValues {
   const allOptions: OptionValues = { ...program.opts(), ...options }
   const network = networkFromOptions(allOptions)
@@ -188,7 +198,12 @@ export function getOptions(program: Command, options: OptionValues): OptionValue
   }
   return { ...allOptions, network }
 }
-
+/**
+ *
+ * @param cap - the max allowed free
+ * @param usedFee - fee that was used
+ * @param specifiedFee - fee specified by the user
+ */
 export function capFeeAt(cap: number, usedFee?: string, specifiedFee?: string): void {
   if (usedFee !== specifiedFee) { // if usedFee was that specified by the user, we don't cap it
     const usedFeeNumber = Number(usedFee) // if one of the fees is defined, usedFee is defined
@@ -297,7 +312,10 @@ export async function initCtxJsonFromOptions(options: OptionValues): Promise<voi
 
 //////////////////////////////////////////////////////////////////////////////////////////
 // Network info
-
+/** @description - Logs address info
+ * @description Returns the address info
+ * @param ctx - the context file aka ctx.json
+ */
 export function logAddressInfo(ctx: Context) {
   const [pubX, pubY] = ctx.publicKey!
   const compressedPubKey = compressPublicKey(pubX, pubY).toString('hex')
@@ -307,6 +325,10 @@ export function logAddressInfo(ctx: Context) {
   log(`secp256k1 public key: 0x${compressedPubKey}`)
 }
 
+/**
+ * @description Returns the balance info of the account
+ * @param ctx - the context file aka ctx.json
+ */
 export async function logBalanceInfo(ctx: Context) {
   let cbalance = (toBN(await ctx.web3.eth.getBalance(ctx.cAddressHex!)))!.toString()
   let pbalance = (toBN((await ctx.pchain.getBalance(ctx.pAddressBech32!)).balance))!.toString()
@@ -317,6 +339,10 @@ export async function logBalanceInfo(ctx: Context) {
   log(`P-chain ${ctx.pAddressBech32}: ${pbalance} FLR`)
 }
 
+/**
+ * @description Retuns info aboout P,C and asset id
+ * @param ctx - the context file
+ */
 export function logNetworkInfo(ctx: Context) {
   const pchainId = ctx.pchain.getBlockchainID()
   const cchainId = ctx.cchain.getBlockchainID()
@@ -326,6 +352,10 @@ export function logNetworkInfo(ctx: Context) {
   log(`assetId: ${ctx.avaxAssetID}`)
 }
 
+/**
+ * @description Returns the validator information regrading current and pending validators
+ * @param ctx - the context file
+ */
 export async function logValidatorInfo(ctx: Context) {
   const pending = await ctx.pchain.getPendingValidators()
   const current = await ctx.pchain.getCurrentValidators()

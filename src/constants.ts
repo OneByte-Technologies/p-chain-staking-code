@@ -12,11 +12,22 @@ import {
   decodePublicKey
 } from './utils'
 
+/**
+ * @description - parses the file and returns the context of ctx.json
+ * @param ctxFile - path to the context file
+ * @returns
+ */
 export function readContextFile(ctxFile: string): ContextFile {
   const file = fs.readFileSync(ctxFile, 'utf8')
   return JSON.parse(file) as ContextFile
 }
 
+/**
+ * @description Returns the context from .env file
+ * @param path - path to the .env file
+ * @param network - network info. can be localflare, costwo, flare
+ * @returns - returns the context from .env file
+ */
 export function contextEnv(path: string, network: string): Context {
   require('dotenv').config({ path: path })
   return getContext(
@@ -36,7 +47,7 @@ export function networkFromContextFile(ctxFile: string): string {
   return ctx.network
 }
 
-// ANSI escape codes for colors
+/** @description ANSI escape codes for colors */
 export const colorCodes = {
   redColor: '\x1b[31m',
   greenColor: '\x1b[32m',
@@ -46,19 +57,34 @@ export const colorCodes = {
   orangeColor: '\x1b[38;5;208m'
 }
 
+/** @description emoji contants */
 export const emojis = {
   happy: '😀',
 }
 
+/** @description mapping of network name with network code */
 export const networkMapping = {
   "Flare": "flare",
   "Coston2": "costwo"
 }
 
+/**
+ * @description returns the context
+ * @param network - network name: flare/localflare/costwo
+ * @param publicKey - public key
+ * @param privateKeyHex - private key in hex format
+ * @param privateKeyCB58 - private key in cb58 format
+ * @returns
+ */
 export function getContext(network: string, publicKey?: string, privateKeyHex?: string, privateKeyCB58?: string): Context {
   return context(getConfig(network), publicKey, privateKeyHex, privateKeyCB58)
 }
 
+/**
+ * @description - returns the network config based on network that was passed
+ * @param network - network name: flare/localflare/costwo
+ * @returns the network configuration
+ */
 export function getConfig(network: string | undefined): NetworkConfig {
   let networkConfig
   if (network == 'flare' || network === undefined) {
@@ -71,6 +97,14 @@ export function getConfig(network: string | undefined): NetworkConfig {
   return networkConfig
 }
 
+/**
+ * The main function that returns the cotext
+ * @param config - network configuration
+ * @param publicKey - public key
+ * @param privkHex - private key in hex format
+ * @param privkCB58 - private key in cb58 format
+ * @returns the context object
+ */
 export function context(
   config: NetworkConfig,
   publicKey?: string, privkHex?: string, privkCB58?: string,
