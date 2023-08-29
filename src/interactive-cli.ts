@@ -8,6 +8,11 @@ import { getPathsAndAddresses } from './ledger/utils';
 import { DerivedAddress } from './interfaces';
 import fs from 'fs'
 
+/***
+ * @description THandles all operations pertaining to the interactive CLL. Creates a list of arguments and calls the comamnder based CLI after taking the relevant inputs from the user.
+ * @param baseargv List of base arguments passed to the application to invoke the interactive CLI
+ * @returns {void}
+ */
 export async function interactiveCli(baseargv: string[]) {
     const walletProperties: ConnectWalletInterface = await connectWallet()
     const task = await selectTask()

@@ -137,7 +137,7 @@ export function expandDerivationPath(derivationPath: string) {
 }
 
 /**
- * @description This function provides a list of addresses for various derivations paths for the connected ledger wallet
+ * @description Provides a list of addresses for various derivations paths for the connected ledger wallet
  * @param {string} network The network that the user wants to connect to
  * @returns {DerivedAddress[]} Retuns a list of objects where every object contains an ethAddress and the corresponsing derivation path
  */

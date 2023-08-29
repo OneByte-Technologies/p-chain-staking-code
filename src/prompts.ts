@@ -2,6 +2,10 @@ import inquirer from 'inquirer';
 import { colorCodes } from './constants';
 import { taskConstants, networkConstants } from './screenConstants';
 
+
+/**
+ * Provides various prompts used in the CLI for user interaction.
+ */
 export const prompts = {
     connectWallet: async () => {
         const questions = [
