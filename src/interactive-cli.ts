@@ -1,54 +1,54 @@
 import { prompts } from "./prompts"
-import { screenConstants } from "./screenConstants"
+import { taskConstants } from "./screenConstants"
 import { colorCodes } from "./constants"
 import { Command } from 'commander'
 import { cli, initCtxJsonFromOptions } from './cli'
-import { ScreenConstantsInterface, connectWalletInterface, ContextFile } from './interfaces'
+import { TaskConstantsInterface, ConnectWalletInterface, ContextFile } from './interfaces'
 import { getPathsAndAddresses } from './ledger/utils';
 import { DerivedAddress } from './interfaces';
 import fs from 'fs'
 
 export async function interactiveCli(baseargv: string[]) {
-    const walletProperties: connectWalletInterface = await connectWallet()
+    const walletProperties: ConnectWalletInterface = await connectWallet()
     const task = await selectTask()
 
     const program = new Command("Flare Stake Tool")
     await cli(program)
 
-    if (Object.keys(screenConstants).slice(0, 4).includes(task.toString())) {
+    if (Object.keys(taskConstants).slice(0, 4).includes(task.toString())) {
         if (walletProperties.wallet.includes("Private Key") && walletProperties.path && walletProperties.network) {
-            const args = [...baseargv.slice(0, 2), "info", screenConstants[task], `--env-path=${walletProperties.path}`, `--network=${walletProperties.network}`, "--get-hacked"]
+            const args = [...baseargv.slice(0, 2), "info", taskConstants[task], `--env-path=${walletProperties.path}`, `--network=${walletProperties.network}`, "--get-hacked"]
             await program.parseAsync(args)
         } else if (walletProperties.wallet.includes("Public Key") || walletProperties.wallet.includes("Ledger")) {
             if (walletProperties.isCreateCtx && walletProperties.network && walletProperties.publicKey) {
                 const initArgs = [...baseargv.slice(0, 2), "init-ctx", "-p", walletProperties.publicKey, `--network=${walletProperties.network}`]
                 await program.parseAsync(initArgs)
             }
-            const args = [...baseargv.slice(0, 2), "info", screenConstants[task], `--ctx-file=ctx.json`]
+            const args = [...baseargv.slice(0, 2), "info", taskConstants[task], `--ctx-file=ctx.json`]
             await program.parseAsync(args)
         }
         else {
             console.log("Incorrect arguments passed!")
         }
     }
-    else if (Object.keys(screenConstants).slice(4, 6).includes(task.toString())) {
+    else if (Object.keys(taskConstants).slice(4, 6).includes(task.toString())) {
         if (walletProperties.wallet.includes("Private Key") && walletProperties.network && walletProperties.path) {
             const amount = await prompts.amount()
-            const argsExport = [...baseargv.slice(0, 2), "transaction", screenConstants[task], '-a', `${amount.amount}`, `--env-path=${walletProperties.path}`, `--network=${walletProperties.network}`, "--get-hacked"]
+            const argsExport = [...baseargv.slice(0, 2), "transaction", taskConstants[task], '-a', `${amount.amount}`, `--env-path=${walletProperties.path}`, `--network=${walletProperties.network}`, "--get-hacked"]
             await program.parseAsync(argsExport)
-            const argsImport = [...baseargv.slice(0, 2), "transaction", `import${screenConstants[task].slice(-2)}`, `--env-path=${walletProperties.path}`, `--network=${walletProperties.network}`, "--get-hacked"]
+            const argsImport = [...baseargv.slice(0, 2), "transaction", `import${taskConstants[task].slice(-2)}`, `--env-path=${walletProperties.path}`, `--network=${walletProperties.network}`, "--get-hacked"]
             await program.parseAsync(argsImport)
         }
         else {
             console.log("only pvt key supported for txns right now")
         }
     }
-    else if (Object.keys(screenConstants)[7] == task.toString()) {
+    else if (Object.keys(taskConstants)[7] == task.toString()) {
         if (walletProperties.wallet.includes("Private Key") && walletProperties.network && walletProperties.path) {
             const amount = await prompts.amount()
             const nodeId = await prompts.nodeId()
             const { startTime, endTime } = await getDuration()
-            const argsExport = [...baseargv.slice(0, 2), "transaction", screenConstants[task], '-n', `${nodeId.id}`, `--network=${walletProperties.network}`, '-a', `${amount.amount}`, '-s', `${startTime}`, '-e', `${endTime}`, `--env-path=${walletProperties.path}`, "--get-hacked"]
+            const argsExport = [...baseargv.slice(0, 2), "transaction", taskConstants[task], '-n', `${nodeId.id}`, `--network=${walletProperties.network}`, '-a', `${amount.amount}`, '-s', `${startTime}`, '-e', `${endTime}`, `--env-path=${walletProperties.path}`, "--get-hacked"]
             await program.parseAsync(argsExport)
         }
         else {
@@ -60,7 +60,7 @@ export async function interactiveCli(baseargv: string[]) {
     }
 }
 
-async function connectWallet(): Promise<connectWalletInterface> {
+async function connectWallet(): Promise<ConnectWalletInterface> {
     const walletPrompt = await prompts.connectWallet()
     const wallet = walletPrompt.wallet.split("\\")[0] //removing ANSI color code
     if (wallet.includes("Private Key")) {
@@ -134,7 +134,7 @@ async function selectNetwork() {
     return network.network
 }
 
-async function selectTask(): Promise<keyof ScreenConstantsInterface> {
+async function selectTask(): Promise<keyof TaskConstantsInterface> {
     const task = await prompts.selectTask()
     return task.task
 }

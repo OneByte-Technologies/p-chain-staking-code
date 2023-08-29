@@ -1,6 +1,6 @@
 import inquirer from 'inquirer';
 import { colorCodes } from './constants';
-import { screenConstants } from './screenConstants';
+import { taskConstants, networkConstants } from './screenConstants';
 
 export const prompts = {
     connectWallet: async () => {
@@ -62,7 +62,7 @@ export const prompts = {
         return inquirer.prompt(questions);
     },
 
-    unixTime: async (timeType:string) => {
+    unixTime: async (timeType: string) => {
         const questions = [
             {
                 type: 'input',
@@ -97,10 +97,12 @@ export const prompts = {
                 type: 'list',
                 name: 'network',
                 message: `${colorCodes.magentaColor}Which network do you want to connect to?${colorCodes.resetColor}`,
-                choices: [`Flare ${colorCodes.greenColor}(Mainnet)`, `Coston2 ${colorCodes.yellowColor}(Testnet)`],
+                choices: [
+                    ...Object.values(networkConstants)
+                ],
                 filter: (val: string) => {
-                    const network = val.split(" ")[0]
-                    return network == "flare"? "flare" : "costwo"
+                    const key = Object.keys(networkConstants).find(key => networkConstants[key] == val)
+                    return key
                 }
             },
         ];
@@ -114,7 +116,7 @@ export const prompts = {
                 name: 'task',
                 message: `${colorCodes.magentaColor}What do you want to do?${colorCodes.resetColor}`,
                 choices: [
-                    ...Object.keys(screenConstants)
+                    ...Object.keys(taskConstants)
                 ],
             },
         ];
