@@ -2,7 +2,7 @@ import { TaskConstantsInterface, NetworkConstantsInterface } from './interfaces'
 import { colorCodes } from './constants';
 
 /**
- * @description Object that constains list of tasks user can perform as its keys and their corresponding CLI commands as values
+ * @description Object that constains list of tasks user can perform as its keys and their corresponding CLI commands as values.
  */
 export const taskConstants: TaskConstantsInterface = {
     'View chain addresses': 'addresses',
