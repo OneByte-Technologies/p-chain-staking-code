@@ -1,3 +1,0 @@
-[submodule "test/speculos"]
-	path = test/speculos
-	url = https://github.com/LedgerHQ/speculos
