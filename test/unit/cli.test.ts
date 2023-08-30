@@ -1,11 +1,13 @@
 import {
+  contextFromOptions,
   networkFromOptions,
   getOptions,
   capFeeAt,
   logAddressInfo,
   logBalanceInfo,
   logNetworkInfo,
-  logValidatorInfo
+  logValidatorInfo,
+  initCtxJsonFromOptions
 } from '../../src/cli';
 import { logInfo, log } from '../../src/output';
 import { contextEnv } from '../../src/constants';
@@ -19,20 +21,51 @@ describe('cli Testcases', () => {
   afterEach(() => {
     jest.clearAllMocks();
   });
+
+  describe('contextFromOptions Testcases', () => {
+    describe('context with ledger', () => {
+      test('Should return context', async () => {
+        const ledger = require('../../src/ledger/key');
+        const spy = jest.spyOn(ledger, 'ledgerGetAccount');
+        spy.mockReturnValue({ publicKey: fixtures.contextFromOptions.mock.ledger.publickey });
+        const context = await contextFromOptions({ ledger: true });
+        expect(context).not.toBeNull
+      });
+
+      test('Should return undefined for publickey when public is not found', async () => {
+        const ledger = require('../../src/ledger/key');
+        const spy = jest.spyOn(ledger, 'ledgerGetAccount');
+        spy.mockReturnValue({ });
+        const context = await contextFromOptions({ ledger: true });
+        expect(context).not.toBeNull
+        expect(context.publicKey).toBeUndefined
+      });
+    });
+
+    test("Should return context for env option", async() => {
+      const context = await contextFromOptions(fixtures.contextFromOptions.input.env)
+      expect(context).not.toBeNull
+    })
+
+    test("Should return context for context file option", async() => {
+      const context = await contextFromOptions(fixtures.contextFromOptions.input.ctx)
+      expect(context).not.toBeNull
+    })
+  });
   describe('networkFromOptions Testcases', () => {
     test('should return flare', () => {
-      const result = networkFromOptions(fixtures.contextFromOptions.flare.input);
-      expect(result).toBe(fixtures.contextFromOptions.flare.output);
+      const result = networkFromOptions(fixtures.networkFromOptions.flare.input);
+      expect(result).toBe(fixtures.networkFromOptions.flare.output);
       expect(logInfo).toHaveBeenCalledWith(
-        `Using network: ${fixtures.contextFromOptions.flare.output}`
+        `Using network: ${fixtures.networkFromOptions.flare.output}`
       );
     });
 
     test('should return flare for null input', () => {
-      const result = networkFromOptions(fixtures.contextFromOptions.null.input);
-      expect(result).toBe(fixtures.contextFromOptions.null.output);
+      const result = networkFromOptions(fixtures.networkFromOptions.null.input);
+      expect(result).toBe(fixtures.networkFromOptions.null.output);
       expect(logInfo).toHaveBeenCalledWith(
-        `Using network: ${fixtures.contextFromOptions.null.output}`
+        `Using network: ${fixtures.networkFromOptions.null.output}`
       );
     });
   });

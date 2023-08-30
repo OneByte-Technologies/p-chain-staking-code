@@ -1,4 +1,3 @@
-
 const fetch = require('node-fetch')
 import { readFileSync, writeFileSync } from 'fs'
 import crypto from "crypto"
@@ -7,17 +6,24 @@ import { SignedTxJson, SignedWithdrawalTxJson, UnsignedTxJson, UnsignedWithdrawa
 
 const gatewayHost = "api.fordefi.com"
 
-export async function sendToForDefi(unsignedTxidFile: string, ctxFile: string, withdrawal: boolean = false): Promise<string> {
+/**
+ * Send signature to forDefi
+ * @param unsignedTxidFile - path to the file
+ * @param ctxFile - ctx file
+ * @param withdrawal - boolen if its a withdrawl trx or not
+ * @param _getVaultPublickey - for testcase mocking purpose, bydefault it calls getVaultPublickey
+ * @returns
+ */
+export async function sendToForDefi(unsignedTxidFile: string, ctxFile: string, withdrawal: boolean = false, _getVaultPublickey = getVaultPublickey): Promise<string> {
 
     const accessToken = readFileSync("../token", 'utf8');
-
     const file = readFileSync(ctxFile, 'utf8');
     const ctx = JSON.parse(file) as ContextFile;
 
     const vault_id = ctx.vaultId!;
 
     // vaultPublicKey should match public key in contex file
-    let vaultPublicKey = await getVaultPublickey(vault_id);
+    let vaultPublicKey = await _getVaultPublickey(vault_id);
     if (unPrefix0x(ctx.publicKey) != vaultPublicKey) {
         throw Error('public key does not match the vault')
     }
@@ -116,11 +122,15 @@ export async function getSignature(unsignedTxidFile: string, withdrawal: boolean
     return signatureHex;
 }
 
-async function getVaultPublickey(vaultId: string): Promise<string> {
+/**
+ * Gets the vault public key
+ * @param vaultId - the valultid
+ * @returns
+ */
+export async function getVaultPublickey(vaultId: string): Promise<string> {
 
     const path = "/api/v1/vaults"
     const accessToken = readFileSync("../token", 'utf8');
-
 
     let response = await fetch(`https://${gatewayHost}${path}/${vaultId}`, {
         method: 'GET',

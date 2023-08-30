@@ -148,7 +148,12 @@ export async function cli(program: Command) {
     })
 }
 
-async function contextFromOptions(options: OptionValues): Promise<Context> {
+/**
+ * Returns the context based the source passed in the options
+ * @param options - option to define whether its from ledger/env/ctx.file
+ * @returns
+ */
+export async function contextFromOptions(options: OptionValues): Promise<Context> {
   if (options.ledger) {
     logInfo("Fetching account from ledger...")
     const account = await ledgerGetAccount(DERIVATION_PATH, options.network)

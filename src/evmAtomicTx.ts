@@ -107,7 +107,7 @@ export async function issueSignedEvmTxPCImport(ctx: Context, signedTxJson: Signe
     ctx.cchain.buildImportTx(...deserializeImportPC_args(serialization)))
 }
 
-async function issueSignedEvmTx(ctx: Context, signedTxJson: SignedTxJson,
+export async function issueSignedEvmTx(ctx: Context, signedTxJson: SignedTxJson,
     txBuilder: (serialization: string) => Promise<UnsignedTx>): Promise<{ chainTxId: string }> {
   const signatures = Array(signedTxJson.signatureRequests.length).fill(signedTxJson.signature)
   const ecdsaSignatures: EcdsaSignature[] = signatures.map((signature: string) => expandSignature(signature))
@@ -117,7 +117,7 @@ async function issueSignedEvmTx(ctx: Context, signedTxJson: SignedTxJson,
   return { chainTxId: chainTxId }
 }
 
-async function getExportCPParams(ctx: Context, amount: BN, fee?: BN, nonce?: number, threshold: number = 1): Promise<ExportCPParams> {
+export async function getExportCPParams(ctx: Context, amount: BN, fee?: BN, nonce?: number, threshold: number = 1): Promise<ExportCPParams> {
   const txcount = await ctx.web3.eth.getTransactionCount(ctx.cAddressHex)
   const locktime: BN = new BN(0)
   const importFee: BN = ctx.pchain.getDefaultTxFee()
@@ -135,15 +135,15 @@ async function getExportCPParams(ctx: Context, amount: BN, fee?: BN, nonce?: num
     threshold,
     fee ?? baseFee
   ]
-  const unsignedTx: UnsignedTx = await ctx.cchain.buildExportTx(...params)
-  if (fee === undefined) {
+   if (fee === undefined) {
+    const unsignedTx: UnsignedTx = await ctx.cchain.buildExportTx(...params)
     const exportCost: number = costExportTx(unsignedTx)
     params[9] = baseFee.mul(new BN(exportCost))
   }
   return params
 }
 
-async function getImportPCParams(ctx: Context, fee?: BN): Promise<ImportPCParams> {
+export async function getImportPCParams(ctx: Context, fee?: BN): Promise<ImportPCParams> {
   const baseFeeResponse: string = await ctx.cchain.getBaseFee()
   const baseFee = new BN(parseInt(baseFeeResponse, 16) / 1e9)
   const evmUTXOResponse: any = await ctx.cchain.getUTXOs(
@@ -159,8 +159,8 @@ async function getImportPCParams(ctx: Context, fee?: BN): Promise<ImportPCParams
     [ctx.cAddressBech32!],
     baseFee
   ]
-  const unsignedTx: UnsignedTx = await ctx.cchain.buildImportTx(...params)
   if (fee === undefined) {
+    const unsignedTx: UnsignedTx = await ctx.cchain.buildImportTx(...params)
     const importCost: number = costImportTx(unsignedTx)
     params[5] = baseFee.mul(new BN(importCost))
   }
