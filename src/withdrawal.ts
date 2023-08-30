@@ -28,7 +28,6 @@ export async function createWithdrawalTransaction(ctx: Context, toAddress: strin
         message: hash,
         forDefiHash: Buffer.from(hash, 'hex').toString('base64')
     }
-
     // save tx data
     saveUnsignedWithdrawalTx(unsignedTx, id);
 

@@ -127,7 +127,7 @@ describe('constants Testcases', () => {
   });
 
   describe('getConfig Testcases', () => {
-    it('should return flare config if network is flare or undefined', () => {
+    test('should return flare config if network is flare or undefined', () => {
       const network = 'flare';
       const flareConfig = getConfig(network);
       expect(flareConfig).not.toBeNull;
@@ -135,21 +135,21 @@ describe('constants Testcases', () => {
       expect(getConfig(undefined)).not.toBeNull;
     });
 
-    it('should return costwo config if network is costwo', () => {
+    test('should return costwo config if network is costwo', () => {
         const network = 'costwo';
         const costwo = getConfig(network);
         expect(costwo).not.toBeNull;
         expect(costwo.hrp).toBe(network);
     });
 
-    it('should return localflare config if network is localflare', () => {
+    test('should return localflare config if network is localflare', () => {
         const network = 'localflare';
         const localflare = getConfig(network);
         expect(localflare).not.toBeNull;
         expect(localflare.hrp).toBe(network);
     });
 
-    it('should throw an error for an invalid network', () => {
+    test('should throw an error for an invalid network', () => {
       expect(() => getConfig('invalidnetwork')).toThrowError('Invalid network');
     });
   });

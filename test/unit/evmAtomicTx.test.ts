@@ -47,7 +47,7 @@ describe('evmAtomicTx Testcases', () => {
 
   describe('issueSignedEvmTx function', () => {
     //@ts-ignore
-    it('issues a signed EVM transaction', async () => {
+    test('issues a signed EVM transaction', async () => {
       let ctx = contextEnv('.env', 'localflare');
       const utils = require('../../src/utils');
       const spy = jest.spyOn(utils, 'expandSignature');
