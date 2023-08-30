@@ -135,32 +135,3 @@ export function expandDerivationPath(derivationPath: string) {
   const signPath = derivationPath.substring(derivationPath.length - 3)
   return { accountPath: accountPath, signPath: signPath }
 }
-
-/**
- * @description Provides a list of addresses for various derivations paths for the connected ledger wallet
- * @param {string} network The network for which addresses need to be derived
- * @returns {DerivedAddress[]} Retuns a list of objects where every object contains an ethAddress and the corresponsing derivation path
- */
-export async function getPathsAndAddresses(network: string): Promise<DerivedAddress[]> {
-  const BASE_PATH = "m/44'/60'/0'/0/"
-  const PATH_LIST = []
-
-  for (let i = 0; i < 10; i++) {
-    PATH_LIST.push(BASE_PATH + i.toString())
-  }
-
-  const results: DerivedAddress[] = [];
-
-  for (const path of PATH_LIST) {
-    const { publicKey,address } = await ledgerGetAccount(path, network)
-    const ethAddress = publicKeyToEthereumAddressString(publicKey)
-    const derivedAddress: DerivedAddress = {
-      ethAddress : ethAddress,
-      derivationPath : path,
-      publicKey : publicKey
-    }
-    results.push(derivedAddress)
-  }
-
-  return results
-}
