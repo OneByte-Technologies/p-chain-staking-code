@@ -923,7 +923,7 @@ describe('Unit Test Cases for utils', () => {
       expect(mockFunc).toHaveBeenCalled();
     });
 
-    it.skip('should retry and eventually throw timeout error', async () => {
+    test.skip('should retry and eventually throw timeout error', async () => {
       const mockGetTransactionCount = jest.fn().mockResolvedValueOnce(1).mockResolvedValue(1); // Simulate no nonce change for all retries
       const mockWeb3 = {
         eth: {

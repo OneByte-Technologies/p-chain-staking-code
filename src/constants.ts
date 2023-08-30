@@ -37,11 +37,21 @@ export function contextEnv(path: string, network: string): Context {
     process.env.PRIVATE_KEY_CB58)
 }
 
+/**
+ * 
+ * @param ctxFile - path to the context file
+ * @returns returns the context
+ */
 export function contextFile(ctxFile: string): Context {
   const ctx = readContextFile(ctxFile)
   return getContext(ctx.network, ctx.publicKey)
 }
 
+/**
+ *
+ * @param ctxFile - context file
+ * @returns returns the network from the context
+ */
 export function networkFromContextFile(ctxFile: string): string {
   const ctx = readContextFile(ctxFile)
   return ctx.network

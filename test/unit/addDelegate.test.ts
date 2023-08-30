@@ -6,7 +6,7 @@ import {
 import { contextEnv } from '../../src/constants';
 import { Context } from '../../src/interfaces';
 import fixtures from '../fixtures/addDelegate.data';
-import { tranferFundsFromCtoP } from '../helper/testHelpers';
+
 describe('addDelegate Testcases', () => {
   describe('getAddDelegatorParams Testcases [.env]', () => {
     let ctx: Context = contextEnv('.env', 'localflare');
