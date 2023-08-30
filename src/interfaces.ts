@@ -106,3 +106,14 @@ export interface ConnectWalletInterface {
   network?: string;
   isCreateCtx?: boolean;
 }
+
+/**
+ * Represents a derived address from a Ledger device
+ * @interface DerivedAddress
+ */
+export interface DerivedAddress {
+  ethAddress: string,
+  publicKey :string,
+  balance?: string,
+  derivationPath: string
+}

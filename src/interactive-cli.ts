@@ -75,6 +75,31 @@ async function connectWallet(): Promise<ConnectWalletInterface> {
 
         return { wallet, isCreateCtx, publicKey, network }
     }
+    else if (wallet.includes("Ledger")) {
+        const isCreateCtx = await getCtxStatus()
+        let network
+        if (isCreateCtx) {
+            network = await selectNetwork()
+
+            console.log("Fetching Addresses...")
+            const pathList: DerivedAddress[] = await getPathsAndAddresses(network)
+            const choiceList = await createChoicesFromAddress(pathList)
+            const selectedAddress = await prompts.selectAddress(choiceList)
+
+            const selectedDerivedAddress = pathList.find(item => item.ethAddress == selectedAddress.address)
+            const selectedDerivationPath = selectedDerivedAddress?.derivationPath
+
+            const optionsObject = {
+                network,
+                blind: false,
+                ctxFile: 'ctx.json',
+                ledger: true
+            }
+            await initCtxJsonFromOptions(optionsObject, selectedDerivationPath)
+        }
+
+        return { wallet, network, isCreateCtx: false }
+    }
     else {
         return { wallet }
     }
@@ -120,3 +145,58 @@ function readInfoFromCtx(filePath: string): ContextFile {
     return { publicKey, network, ethAddress }
 
 }
+
+async function createChoicesFromAddress(pathList: DerivedAddress[]) {
+    const choiceList: string[] = []
+
+    for (let i = 0; i < 10; i++) {
+        const choice = pathList[i].ethAddress
+        choiceList.push(`${i + 1}. ${choice}`)
+    }
+
+    return choiceList
+}
+
+async function getCtxStatus(): Promise<boolean> {
+    let isCreateCtx = true
+    const isFileExist: Boolean = fileExists("ctx.json");
+
+    if (isFileExist) {
+        console.log(`${colorCodes.magentaColor}You already have an existing Ctx file with the following parameters - ${colorCodes.resetColor}`)
+        const { network: ctxNetwork, publicKey: ctxPublicKey, ethAddress: ctxEthAddress } = readInfoFromCtx("ctx.json")
+        console.log(`${colorCodes.orangeColor}Public Key:${colorCodes.resetColor} ${ctxPublicKey}`)
+        console.log(`${colorCodes.orangeColor}Network:${colorCodes.resetColor} ${ctxNetwork}`)
+        if (ctxEthAddress) {
+            console.log(`${colorCodes.orangeColor}Eth Address:${colorCodes.resetColor} ${ctxEthAddress}`)
+        }
+        const getUserChoice = await prompts.ctxFile();
+        const isContinue: Boolean = getUserChoice.isContinue
+
+        if (isContinue) {
+            isCreateCtx = false
+        } else {
+            try {
+                fs.unlinkSync('ctx.json');
+                console.log('File "ctx.json" has been deleted.');
+            } catch (error) {
+                console.error('An error occurred while deleting the file:', error);
+            }
+        }
+    }
+
+    return isCreateCtx
+}
+
+
+
+// async function addBalanceInfo(pathList : DerivedAddress[],network:string) {
+
+//     for ( let path of pathList) {
+//         const ctx = { publicKey : path.publicKey,
+//         network: network}
+//     }
+//     let cbalance = (toBN(await ctx.web3.eth.getBalance(ctx.cAddressHex!)))!.toString()
+//     let pbalance = (toBN((await ctx.pchain.getBalance(ctx.pAddressBech32!)).balance))!.toString()
+//     cbalance = integerToDecimal(cbalance, 18)
+//     pbalance = integerToDecimal(pbalance, 9)
+// }
