@@ -1,4 +1,5 @@
 import { BN } from '@flarenetwork/flarejs/dist';
+
 const fixtures = {
   getAddValidatorParams: {
     input: {

@@ -270,14 +270,6 @@ describe('forDefi Testcases', () => {
           }
         )
       );
-
-      // const result = await forDefi.sendToForDefi(
-      //   fixtures.sendToForDefi.input.unsignedTxidFile,
-      //   fixtures.sendToForDefi.input.ctxFile,
-      //   false,
-      //   dummyGetVaultPublickeyjest
-      // );
-      // expect(result).toBe(fixtures.sendToForDefi.mock.txId);
       await expect(
         forDefi.sendToForDefi(
           fixtures.sendToForDefi.input.unsignedTxidFile,

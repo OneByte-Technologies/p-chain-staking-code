@@ -149,9 +149,9 @@ export async function cli(program: Command) {
 }
 
 /**
- * Returns the context based the source passed in the options
+ *
  * @param options - option to define whether its from ledger/env/ctx.file
- * @returns
+ * @returns Returns the context based the source passed in the options
  */
 export async function contextFromOptions(options: OptionValues): Promise<Context> {
   if (options.ledger) {
@@ -317,9 +317,10 @@ export async function initCtxJsonFromOptions(options: OptionValues): Promise<voi
 
 //////////////////////////////////////////////////////////////////////////////////////////
 // Network info
-/** @description - Logs address info
- * @description Returns the address info
+/**
+ * @description Logs the address info
  * @param ctx - the context file aka ctx.json
+ * @returns Returns the address info
  */
 export function logAddressInfo(ctx: Context) {
   const [pubX, pubY] = ctx.publicKey!

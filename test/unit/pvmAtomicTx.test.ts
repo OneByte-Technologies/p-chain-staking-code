@@ -11,7 +11,7 @@ import { contextEnv } from '../../src/constants';
 import { Context } from '../../src/interfaces';
 import fixtures from '../fixtures/pvmAtomicTx.data';
 import { UTXOSet, UnsignedTx, Tx } from '@flarenetwork/flarejs/dist/apis/platformvm';
-import { EcdsaSignature } from '@flarenetwork/flarejs/dist/common';
+
 describe('pvmAtomicTx testcases', () => {
   describe('getExportPCParams', () => {
     test('Should return params successfully', async () => {
