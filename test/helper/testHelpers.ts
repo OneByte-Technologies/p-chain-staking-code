@@ -59,7 +59,7 @@ export const compareValues = (a: any, b: any): boolean => {
 };
 
 /**
- * @description - trnafers funds from C to P chain
+ * @description - transfers funds from C to P chain
  */
 export const tranferFundsFromCtoP = async () => {
   try {

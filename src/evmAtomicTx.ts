@@ -13,7 +13,7 @@ type ExportCPParams = [BN, string, string, string, string, string[], number, BN,
 type ImportPCParams = [UTXOSet, string, string[], string, string[], BN]
 
 /**
- * Exports funds from C-chain to P-chain
+ * @description  Exports funds from C-chain to P-chain
  * @param ctx - context with constants initialized from user keys
  * @param amount - amount to export from C-chain to P-chain
  * @param fee - export transaction fee
@@ -31,7 +31,7 @@ export async function exportTxCP(
 }
 
 /**
- * Import funds exported from P-chain to C-chain.
+ * @description  Import funds exported from P-chain to C-chain.
  * @param ctx - context with constants initialized from user keys
  * @param fee - import transaction fee
  */
@@ -69,7 +69,7 @@ export async function getUnsignedExportTxCP(
 }
 
 /**
- * Generate unsigned import transaction from P-chain to C-chain.
+ * @description  Generate unsigned import transaction from P-chain to C-chain.
  * @param ctx - context with constants initialized from user keys
  * @param fee - import transaction fee
  */
@@ -88,7 +88,7 @@ export async function getUnsignedImportTxPC(
 }
 
 /**
- * Issue a transaction to export funds from C-chain to P-chain
+ * @description Issue a transaction to export funds from C-chain to P-chain
  * @param ctx - context with constants initialized from user keys
  * @param signedTxJson - signed transaction
  */
@@ -98,7 +98,7 @@ export async function issueSignedEvmTxCPExport(ctx: Context, signedTxJson: Signe
 }
 
 /**
- * Issue a transaction to import funds from P-chain
+ * @description Issue a transaction to import funds from P-chain
  * @param ctx - context with constants initialized from user keys
  * @param signedTxJson - signed transaction
  */
@@ -108,7 +108,7 @@ export async function issueSignedEvmTxPCImport(ctx: Context, signedTxJson: Signe
 }
 
 /**
- *
+ * @description - issues signed transaction
  * @param ctx - context file
  * @param signedTxJson - signed json object
  * @param txBuilder
@@ -125,7 +125,7 @@ export async function issueSignedEvmTx(ctx: Context, signedTxJson: SignedTxJson,
 }
 
 /**
- *
+ * @description - generates params to export funds from C to P
  * @param ctx - context file
  * @param amount - amount to be exported
  * @param fee - fees
@@ -160,7 +160,7 @@ export async function getExportCPParams(ctx: Context, amount: BN, fee?: BN, nonc
 }
 
 /**
- *
+ * @description - generates params to imports funds from P to C
  * @param ctx - context file
  * @param fee - fee is any
  * @returns - returns the params that will be needed to import funds from P to C chain

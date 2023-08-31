@@ -204,7 +204,7 @@ export function getOptions(program: Command, options: OptionValues): OptionValue
   return { ...allOptions, network }
 }
 /**
- *
+ * @description - Returms the fee getting used
  * @param cap - the max allowed free
  * @param usedFee - fee that was used
  * @param specifiedFee - fee specified by the user
@@ -332,7 +332,7 @@ export function logAddressInfo(ctx: Context) {
 }
 
 /**
- * @description Returns the balance info of the account
+ * @description Logs the balance info of the account
  * @param ctx - the context file aka ctx.json
  */
 export async function logBalanceInfo(ctx: Context) {
@@ -346,7 +346,7 @@ export async function logBalanceInfo(ctx: Context) {
 }
 
 /**
- * @description Retuns info aboout P,C and asset id
+ * @description Logs info aboout P,C and asset id
  * @param ctx - the context file
  */
 export function logNetworkInfo(ctx: Context) {
@@ -359,7 +359,7 @@ export function logNetworkInfo(ctx: Context) {
 }
 
 /**
- * @description Returns the validator information regrading current and pending validators
+ * @description Logs the validator information regrading current and pending validators
  * @param ctx - the context file
  */
 export async function logValidatorInfo(ctx: Context) {

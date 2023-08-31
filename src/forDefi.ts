@@ -7,7 +7,7 @@ import { SignedTxJson, SignedWithdrawalTxJson, UnsignedTxJson, UnsignedWithdrawa
 const gatewayHost = "api.fordefi.com"
 
 /**
- * Send signature to forDefi
+ * @description - Send signature to forDefi
  * @param unsignedTxidFile - path to the file
  * @param ctxFile - ctx file
  * @param withdrawal - boolen if its a withdrawl trx or not
@@ -81,6 +81,12 @@ export async function sendToForDefi(unsignedTxidFile: string, ctxFile: string, w
     return txId;
 }
 
+/**
+ * @description - gets the signature from forDefi
+ * @param unsignedTxidFile - unsigned transaction file
+ * @param withdrawal - whether withdrawl is enabled or not
+ * @returns signature
+ */
 export async function getSignature(unsignedTxidFile: string, withdrawal: boolean = false): Promise<string> {
 
     const path = "/api/v1/transactions"
@@ -123,9 +129,9 @@ export async function getSignature(unsignedTxidFile: string, withdrawal: boolean
 }
 
 /**
- * Gets the vault public key
+ * @description Gets the vault public key
  * @param vaultId - the valultid
- * @returns
+ * @returns returns vault public key
  */
 export async function getVaultPublickey(vaultId: string): Promise<string> {
 

@@ -10,6 +10,7 @@ import {
 import { contextEnv } from '../../src/constants';
 import { Context } from '../../src/interfaces';
 import fixtures from '../fixtures/evmAtomicTx.data';
+
 describe('evmAtomicTx Testcases', () => {
   describe('getImportPCParams', () => {
     test('Should return the params with the fees', async () => {
