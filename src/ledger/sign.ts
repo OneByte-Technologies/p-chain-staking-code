@@ -1,5 +1,5 @@
 import fs from 'fs'
-import TransportNodeHid from '@ledgerhq/hw-transport-node-hid';
+import TransportNodeHid from '@ledgerhq/hw-transport-node-hid'
 import AvalancheApp from '@avalabs/hw-app-avalanche'
 import { sha256 } from 'ethereumjs-util'
 import { recoverTransactionPublicKey, recoverTransactionSigner, prefix0x, standardizePublicKey, expandDerivationPath } from './utils'
@@ -68,7 +68,7 @@ export async function signId(id: string, derivationPath: string, blind: boolean 
 }
 
 /**
- * 
+ *
  * @param file - file name
  * @param derivationPath - path to the accounts in ledger
  * @param blind - default true
