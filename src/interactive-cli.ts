@@ -1,11 +1,10 @@
 import { prompts } from "./prompts"
-import { taskConstants } from "./screenConstants"
+import { taskConstants, walletConstants } from "./screenConstants"
 import { colorCodes } from "./constants"
 import { Command } from 'commander'
 import { cli, initCtxJsonFromOptions } from './cli'
-import { TaskConstantsInterface, ConnectWalletInterface, ContextFile } from './interfaces'
-import { getPathsAndAddresses } from './ledger/utils';
-import { DerivedAddress } from './interfaces';
+import { ConnectWalletInterface, ContextFile, DerivedAddress, ScreenConstantsInterface } from './interfaces'
+import { getPathsAndAddresses } from './ledger/utils'
 import fs from 'fs'
 
 /***
@@ -21,10 +20,10 @@ export async function interactiveCli(baseargv: string[]) {
     await cli(program)
 
     if (Object.keys(taskConstants).slice(0, 4).includes(task.toString())) {
-        if (walletProperties.wallet.includes("Private Key") && walletProperties.path && walletProperties.network) {
+        if (walletProperties.wallet == Object.keys(walletConstants)[2] && walletProperties.path && walletProperties.network) {
             const args = [...baseargv.slice(0, 2), "info", taskConstants[task], `--env-path=${walletProperties.path}`, `--network=${walletProperties.network}`, "--get-hacked"]
             await program.parseAsync(args)
-        } else if (walletProperties.wallet.includes("Public Key") || walletProperties.wallet.includes("Ledger")) {
+        } else if (walletProperties.wallet == Object.keys(walletConstants)[0] || walletProperties.wallet == Object.keys(walletConstants)[1]) {
             if (walletProperties.isCreateCtx && walletProperties.network && walletProperties.publicKey) {
                 const initArgs = [...baseargv.slice(0, 2), "init-ctx", "-p", walletProperties.publicKey, `--network=${walletProperties.network}`]
                 await program.parseAsync(initArgs)
@@ -37,7 +36,7 @@ export async function interactiveCli(baseargv: string[]) {
         }
     }
     else if (Object.keys(taskConstants).slice(4, 6).includes(task.toString())) {
-        if (walletProperties.wallet.includes("Private Key") && walletProperties.network && walletProperties.path) {
+        if (walletProperties.wallet == Object.keys(walletConstants)[2] && walletProperties.network && walletProperties.path) {
             const amount = await prompts.amount()
             const argsExport = [...baseargv.slice(0, 2), "transaction", taskConstants[task], '-a', `${amount.amount}`, `--env-path=${walletProperties.path}`, `--network=${walletProperties.network}`, "--get-hacked"]
             await program.parseAsync(argsExport)
@@ -49,7 +48,7 @@ export async function interactiveCli(baseargv: string[]) {
         }
     }
     else if (Object.keys(taskConstants)[7] == task.toString()) {
-        if (walletProperties.wallet.includes("Private Key") && walletProperties.network && walletProperties.path) {
+        if (walletProperties.wallet == Object.keys(walletConstants)[2] && walletProperties.network && walletProperties.path) {
             const amount = await prompts.amount()
             const nodeId = await prompts.nodeId()
             const { startTime, endTime } = await getDuration()
@@ -68,14 +67,14 @@ export async function interactiveCli(baseargv: string[]) {
 async function connectWallet(): Promise<ConnectWalletInterface> {
     const walletPrompt = await prompts.connectWallet()
     const wallet = walletPrompt.wallet.split("\\")[0] //removing ANSI color code
-    if (wallet.includes("Private Key")) {
+    if (wallet == Object.keys(walletConstants)[2]) {
         console.log(`${colorCodes.redColor}Warning: You are connecting using your private key which is not recommended`)
         const pvtKeyPath = await prompts.pvtKeyPath()
         const path = pvtKeyPath.pvtKeyPath
         const network = await selectNetwork()
         return { wallet, path, network }
     }
-    else if (wallet.includes("Public Key")) {
+    else if (wallet == Object.keys(walletConstants)[1]) {
         const isCreateCtx = await getCtxStatus()
 
         let publicKey, network
@@ -87,7 +86,7 @@ async function connectWallet(): Promise<ConnectWalletInterface> {
 
         return { wallet, isCreateCtx, publicKey, network }
     }
-    else if (wallet.includes("Ledger")) {
+    else if (wallet == Object.keys(walletConstants)[0]) {
         const isCreateCtx = await getCtxStatus()
         let network
         if (isCreateCtx) {
@@ -122,7 +121,7 @@ async function selectNetwork() {
     return network.network
 }
 
-async function selectTask(): Promise<keyof TaskConstantsInterface> {
+async function selectTask(): Promise<keyof ScreenConstantsInterface> {
     const task = await prompts.selectTask()
     return task.task
 }
@@ -198,17 +197,3 @@ async function getCtxStatus(): Promise<boolean> {
 
     return isCreateCtx
 }
-
-
-
-// async function addBalanceInfo(pathList : DerivedAddress[],network:string) {
-
-//     for ( let path of pathList) {
-//         const ctx = { publicKey : path.publicKey,
-//         network: network}
-//     }
-//     let cbalance = (toBN(await ctx.web3.eth.getBalance(ctx.cAddressHex!)))!.toString()
-//     let pbalance = (toBN((await ctx.pchain.getBalance(ctx.pAddressBech32!)).balance))!.toString()
-//     cbalance = integerToDecimal(cbalance, 18)
-//     pbalance = integerToDecimal(pbalance, 9)
-// }
