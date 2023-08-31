@@ -73,7 +73,7 @@ export async function cli(program: Command) {
     .option("--threshold <threshold>", "Threshold of the constructed transaction", "1")
     .action(async (type: string, options: OptionValues) => {
       options = getOptions(program, options)
-      const ctx = await contextFromOptions(options)
+      const ctx = await contextFromOptions(options,options.derivationPath)
       if (options.getHacked) {
         // this is more of a concept for future development, by now private key was already exposed to dependencies
         const response = await getUserInput(`${colorCodes.redColor}Warning: You are about to expose your private key to 800+ dependencies, and we cannot guarantee one of them is not malicious! \nThis command is not meant to be used in production, but for testing only!${colorCodes.resetColor} \nProceed? (Y/N) `)
@@ -151,10 +151,10 @@ export async function cli(program: Command) {
     })
 }
 
-async function contextFromOptions(options: OptionValues): Promise<Context> {
+async function contextFromOptions(options: OptionValues, derivationPath: string = DERIVATION_PATH): Promise<Context> {
   if (options.ledger) {
     logInfo("Fetching account from ledger...")
-    const account = await ledgerGetAccount(DERIVATION_PATH, options.network)
+    const account = await ledgerGetAccount(derivationPath, options.network)
     const context = getContext(options.network, account.publicKey)
     return context
   } else if (options.envPath) {
@@ -348,7 +348,7 @@ async function cliBuildAndSendTxUsingLedger(transactionType: string, context: Co
   const unsignedTxJson: UnsignedTxJson = await buildUnsignedTxJson(transactionType, context, params)
   capFeeAt(MAX_TRANSCTION_FEE, unsignedTxJson.usedFee, params.fee)
   logInfo("Please review and sign the transaction on your ledger device...")
-  const { signature } = await ledgerSign(unsignedTxJson, DERIVATION_PATH, blind)
+  const { signature } = await ledgerSign(unsignedTxJson, derivationPath, blind)
   const signedTxJson = { ...unsignedTxJson, signature }
   logInfo("Sending transaction to the node...")
   const chainTxId = await sendSignedTxJson(context, signedTxJson)

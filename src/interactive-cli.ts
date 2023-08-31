@@ -54,7 +54,7 @@ export async function interactiveCli(baseargv: string[]) {
                 await program.parseAsync(argsExport)
                 const argsImport = [...baseargv.slice(0, 2), "transaction", `import${taskConstants[task].slice(-2)}`, "--blind", "true", "--derivation-path", ctxDerivationPath, `--network=${ctxNetwork}`, "--ledger"]
                 console.log("Please approve import transaction")
-                console.log(argsImport)
+                // console.log(argsImport)
                 await program.parseAsync(argsImport)
             }
             else {
