@@ -72,8 +72,21 @@ export async function interactiveCli(baseargv: string[]) {
             const argsExport = [...baseargv.slice(0, 2), "transaction", taskConstants[task], '-n', `${nodeId.id}`, `--network=${walletProperties.network}`, '-a', `${amount.amount}`, '-s', `${startTime}`, '-e', `${endTime}`, `--env-path=${walletProperties.path}`, "--get-hacked"]
             await program.parseAsync(argsExport)
         }
+        else if (walletProperties.wallet == Object.keys(walletConstants)[0] && fileExists("ctx.json")) {
+            const { network: ctxNetwork, derivationPath: ctxDerivationPath } = readInfoFromCtx("ctx.json")
+            if (ctxNetwork && ctxDerivationPath) {
+                const amount = await prompts.amount()
+                const nodeId = await prompts.nodeId()
+                const { startTime, endTime } = await getDuration()
+                const argsExport = [...baseargv.slice(0, 2), "transaction", taskConstants[task], '-n', `${nodeId.id}`, '-a', `${amount.amount}`, '-s', `${startTime}`, '-e', `${endTime}`, "--blind", "true", "--derivation-path", ctxDerivationPath, `--network=${ctxNetwork}`, "--ledger"]
+                // console.log(argsExport)
+                await program.parseAsync(argsExport)
+            } else {
+                console.log("Missing params in ctx file")
+            }
+        }
         else {
-            console.log("only pvt key supported for delegation right now")
+            console.log("only pvt key and ledger supported for delegation right now")
         }
     }
     else {
