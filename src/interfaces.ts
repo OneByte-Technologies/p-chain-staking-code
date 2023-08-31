@@ -30,6 +30,7 @@ export interface ContextFile {
   flareAddress?: string
   ethAddress?: string
   vaultId?: string
+  derivationPath?: string
 }
 
 export interface UnsignedTxJson {
@@ -78,14 +79,34 @@ interface WithdrawalTxData {
   chainId: number
 }
 
+/**
+ * Represents the various constants used by the CLI
+ * @interface ScreenConstantsInterface
+ */
 export interface ScreenConstantsInterface {
   [key: string]: string;
 }
 
-export interface connectWalletInterface {
+
+/**
+ * Represents the properties returned from the "connectWallet" function
+ * @interface ConnectWalletInterface
+ */
+export interface ConnectWalletInterface {
   wallet: string;
   path?: string;
   publicKey?: string;
   network?: string;
   isCreateCtx?: boolean;
+}
+
+/**
+ * Represents a derived address from a Ledger device
+ * @interface DerivedAddress
+ */
+export interface DerivedAddress {
+  ethAddress: string,
+  publicKey: string,
+  balance?: string,
+  derivationPath: string
 }
