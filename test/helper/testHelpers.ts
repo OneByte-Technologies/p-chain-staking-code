@@ -3,7 +3,7 @@ import { exportTxCP } from '../../src/evmAtomicTx';
 import { contextEnv } from '../../src/constants';
 
 /**
- *
+ * @description - serializes the buffer data
  * @param bufferData - buffer data
  * @returns returns serialised data
  */
@@ -19,7 +19,7 @@ export const serialize = (bufferData: Buffer[]) => {
 };
 
 /**
- *
+ * @description: converts a data to big number
  * @param data - data of type any
  * @returns - returns it in big number format
  */
@@ -28,7 +28,7 @@ export const covertBNToSting = (data: any): string => {
 };
 
 /**
- *
+ * @description - converts an array of data to big integer
  * @param arr - array of entities
  * @returns - converts each to big number and returns the array
  */
@@ -37,7 +37,7 @@ export const convertArrayBNToString = (arr: any[]): any[] => {
 };
 
 /**
- *
+ * @description - compares two big number
  * @param a - first big number
  * @param b - second big number
  * @returns - returns if both of them are equal or not
