@@ -79,7 +79,6 @@ export async function interactiveCli(baseargv: string[]) {
                 const nodeId = await prompts.nodeId()
                 const { startTime, endTime } = await getDuration()
                 const argsExport = [...baseargv.slice(0, 2), "transaction", taskConstants[task], '-n', `${nodeId.id}`, '-a', `${amount.amount}`, '-s', `${startTime}`, '-e', `${endTime}`, "--blind", "true", "--derivation-path", ctxDerivationPath, `--network=${ctxNetwork}`, "--ledger"]
-                // console.log(argsExport)
                 await program.parseAsync(argsExport)
             } else {
                 console.log("Missing params in ctx file")
