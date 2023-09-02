@@ -157,5 +157,16 @@ export const prompts = {
             },
         ];
         return inquirer.prompt(questions);
+    },
+
+    vaultId: async () => {
+        const questions = [
+            {
+                type: 'input',
+                name: 'id',
+                message: `${colorCodes.magentaColor}Enter a ForDefi Vault Id${colorCodes.yellowColor}(E.g. 42989fc9-xxxx-xxxx-xxxx-xxxxxxxxxxxx)${colorCodes.magentaColor}:${colorCodes.resetColor}`,
+            },
+        ];
+        return inquirer.prompt(questions);
     }
 }

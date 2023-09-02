@@ -24,10 +24,6 @@ export async function interactiveCli(baseargv: string[]) {
             const args = [...baseargv.slice(0, 2), "info", taskConstants[task], `--env-path=${walletProperties.path}`, `--network=${walletProperties.network}`, "--get-hacked"]
             await program.parseAsync(args)
         } else if (walletProperties.wallet == Object.keys(walletConstants)[0] || walletProperties.wallet == Object.keys(walletConstants)[1]) {
-            if (walletProperties.isCreateCtx && walletProperties.network && walletProperties.publicKey) {
-                const initArgs = [...baseargv.slice(0, 2), "init-ctx", "-p", walletProperties.publicKey, `--network=${walletProperties.network}`]
-                await program.parseAsync(initArgs)
-            }
             const args = [...baseargv.slice(0, 2), "info", taskConstants[task], `--ctx-file=ctx.json`]
             await program.parseAsync(args)
         }
@@ -122,14 +118,21 @@ async function connectWallet(): Promise<ConnectWalletInterface> {
     else if (wallet == Object.keys(walletConstants)[1]) {
         const isCreateCtx = await getCtxStatus()
 
-        let publicKey, network
         if (isCreateCtx) {
-            const getPublicKey = await prompts.publicKey()
-            publicKey = getPublicKey.publicKey
-            network = await selectNetwork()
+            const publicKey = await prompts.publicKey()
+            const network = await selectNetwork()
+            const vaultId = await prompts.vaultId()
+            const optionsObject = {
+                network,
+                blind: false,
+                ctxFile: 'ctx.json',
+                publicKey: publicKey.publicKey,
+                vaultId: vaultId.id
+            }
+            await initCtxJsonFromOptions(optionsObject)
         }
 
-        return { wallet, isCreateCtx, publicKey, network }
+        return { wallet }
     }
     else if (wallet == Object.keys(walletConstants)[0]) {
         const isCreateCtx = await getCtxStatus()
@@ -154,7 +157,7 @@ async function connectWallet(): Promise<ConnectWalletInterface> {
             await initCtxJsonFromOptions(optionsObject, selectedDerivationPath)
         }
 
-        return { wallet, isCreateCtx: false }
+        return { wallet }
     }
     else {
         return { wallet }
@@ -189,8 +192,9 @@ function readInfoFromCtx(filePath: string): ContextFile {
     const network = ctxData.network
     const ethAddress = ctxData.ethAddress || undefined
     const derivationPath = ctxData.derivationPath || undefined
+    const vaultId = ctxData.vaultId || undefined
 
-    return { publicKey, network, ethAddress, derivationPath }
+    return { publicKey, network, ethAddress, derivationPath, vaultId }
 
 }
 
@@ -211,11 +215,14 @@ async function getCtxStatus(): Promise<boolean> {
 
     if (isFileExist) {
         console.log(`${colorCodes.magentaColor}You already have an existing Ctx file with the following parameters - ${colorCodes.resetColor}`)
-        const { network: ctxNetwork, publicKey: ctxPublicKey, ethAddress: ctxEthAddress } = readInfoFromCtx("ctx.json")
+        const { network: ctxNetwork, publicKey: ctxPublicKey, ethAddress: ctxEthAddress, vaultId: ctxVaultId } = readInfoFromCtx("ctx.json")
         console.log(`${colorCodes.orangeColor}Public Key:${colorCodes.resetColor} ${ctxPublicKey}`)
         console.log(`${colorCodes.orangeColor}Network:${colorCodes.resetColor} ${ctxNetwork}`)
         if (ctxEthAddress) {
             console.log(`${colorCodes.orangeColor}Eth Address:${colorCodes.resetColor} ${ctxEthAddress}`)
+        }
+        if (ctxVaultId) {
+            console.log(`${colorCodes.orangeColor}Vault Id:${colorCodes.resetColor} ${ctxVaultId}`)
         }
         const getUserChoice = await prompts.ctxFile();
         const isContinue: Boolean = getUserChoice.isContinue
