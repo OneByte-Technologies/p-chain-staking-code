@@ -168,5 +168,16 @@ export const prompts = {
             },
         ];
         return inquirer.prompt(questions);
+    },
+
+    transactionId: async () => {
+        const questions = [
+            {
+                type: 'input',
+                name: 'id',
+                message: `${colorCodes.magentaColor}Enter a Transaction Id${colorCodes.yellowColor}(E.g. abc-txn)${colorCodes.magentaColor}:${colorCodes.resetColor}`,
+            },
+        ];
+        return inquirer.prompt(questions);
     }
 }

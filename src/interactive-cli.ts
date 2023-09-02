@@ -19,29 +19,26 @@ export async function interactiveCli(baseargv: string[]) {
     const program = new Command("Flare Stake Tool")
     await cli(program)
 
+    // First 4 info functions
     if (Object.keys(taskConstants).slice(0, 4).includes(task.toString())) {
-        if (walletProperties.wallet == Object.keys(walletConstants)[2] && walletProperties.path && walletProperties.network) {
-            const args = [...baseargv.slice(0, 2), "info", taskConstants[task], `--env-path=${walletProperties.path}`, `--network=${walletProperties.network}`, "--get-hacked"]
-            await program.parseAsync(args)
-        } else if (walletProperties.wallet == Object.keys(walletConstants)[0] || walletProperties.wallet == Object.keys(walletConstants)[1]) {
+
+        if (walletProperties.wallet == Object.keys(walletConstants)[0] || walletProperties.wallet == Object.keys(walletConstants)[1]) {
             const args = [...baseargv.slice(0, 2), "info", taskConstants[task], `--ctx-file=ctx.json`]
+            await program.parseAsync(args)
+        }
+        else if (walletProperties.wallet == Object.keys(walletConstants)[2] && walletProperties.path && walletProperties.network) {
+            const args = [...baseargv.slice(0, 2), "info", taskConstants[task], `--env-path=${walletProperties.path}`, `--network=${walletProperties.network}`, "--get-hacked"]
             await program.parseAsync(args)
         }
         else {
             console.log("Incorrect arguments passed!")
         }
     }
+
+    // Functions for export and import to move funds between chains
     else if (Object.keys(taskConstants).slice(4, 6).includes(task.toString())) {
-        if (walletProperties.wallet == Object.keys(walletConstants)[2] && walletProperties.network && walletProperties.path) {
-            const amount = await prompts.amount()
-            const argsExport = [...baseargv.slice(0, 2), "transaction", `export${taskConstants[task].slice(-2)}`, '-a', `${amount.amount}`, `--env-path=${walletProperties.path}`, `--network=${walletProperties.network}`, "--get-hacked"]
-            console.log("Please approve export transaction")
-            await program.parseAsync(argsExport)
-            const argsImport = [...baseargv.slice(0, 2), "transaction", `import${taskConstants[task].slice(-2)}`, `--env-path=${walletProperties.path}`, `--network=${walletProperties.network}`, "--get-hacked"]
-            console.log("Please approve import transaction")
-            await program.parseAsync(argsImport)
-        }
-        else if (walletProperties.wallet == Object.keys(walletConstants)[0] && fileExists("ctx.json")) {
+
+        if (walletProperties.wallet == Object.keys(walletConstants)[0] && fileExists("ctx.json")) {
             const { network: ctxNetwork, derivationPath: ctxDerivationPath } = readInfoFromCtx("ctx.json")
             if (ctxNetwork && ctxDerivationPath) {
                 const amount = await prompts.amount()
@@ -56,17 +53,24 @@ export async function interactiveCli(baseargv: string[]) {
                 console.log("Missing params in ctx file")
             }
         }
+        else if (walletProperties.wallet == Object.keys(walletConstants)[2] && walletProperties.network && walletProperties.path) {
+            const amount = await prompts.amount()
+            const argsExport = [...baseargv.slice(0, 2), "transaction", `export${taskConstants[task].slice(-2)}`, '-a', `${amount.amount}`, `--env-path=${walletProperties.path}`, `--network=${walletProperties.network}`, "--get-hacked"]
+            console.log("Please approve export transaction")
+            await program.parseAsync(argsExport)
+            const argsImport = [...baseargv.slice(0, 2), "transaction", `import${taskConstants[task].slice(-2)}`, `--env-path=${walletProperties.path}`, `--network=${walletProperties.network}`, "--get-hacked"]
+            console.log("Please approve import transaction")
+            await program.parseAsync(argsImport)
+        }
         else {
             console.log("only pvt key and ledger supported for txns right now")
         }
     }
+
+    // Adding a validator
     else if (Object.keys(taskConstants)[6] == task.toString()) {
-        if (walletProperties.wallet == Object.keys(walletConstants)[2] && walletProperties.network && walletProperties.path) {
-            const { amount, nodeId, startTime, endTime, delegationFee } = await getDetailsForDelegation(taskConstants[task])
-            const argsExport = [...baseargv.slice(0, 2), "transaction", taskConstants[task], '-n', `${nodeId}`, `--network=${walletProperties.network}`, '-a', `${amount}`, '-s', `${startTime}`, '-e', `${endTime}`, '--delegation-fee', `${delegationFee}`, `--env-path=${walletProperties.path}`, "--get-hacked"]
-            await program.parseAsync(argsExport)
-        }
-        else if (walletProperties.wallet == Object.keys(walletConstants)[0] && fileExists("ctx.json")) {
+
+        if (walletProperties.wallet == Object.keys(walletConstants)[0] && fileExists("ctx.json")) {
             const { network: ctxNetwork, derivationPath: ctxDerivationPath } = readInfoFromCtx("ctx.json")
             const { amount, nodeId, startTime, endTime, delegationFee } = await getDetailsForDelegation(taskConstants[task])
             if (ctxNetwork && ctxDerivationPath && delegationFee) {
@@ -76,17 +80,20 @@ export async function interactiveCli(baseargv: string[]) {
                 console.log("Missing values for certain params")
             }
         }
+        else if (walletProperties.wallet == Object.keys(walletConstants)[2] && walletProperties.network && walletProperties.path) {
+            const { amount, nodeId, startTime, endTime, delegationFee } = await getDetailsForDelegation(taskConstants[task])
+            const argsExport = [...baseargv.slice(0, 2), "transaction", taskConstants[task], '-n', `${nodeId}`, `--network=${walletProperties.network}`, '-a', `${amount}`, '-s', `${startTime}`, '-e', `${endTime}`, '--delegation-fee', `${delegationFee}`, `--env-path=${walletProperties.path}`, "--get-hacked"]
+            await program.parseAsync(argsExport)
+        }
         else {
             console.log("only pvt key and ledger supported for staking right now")
         }
     }
+
+    // Delegating to a Validator
     else if (Object.keys(taskConstants)[7] == task.toString()) {
-        if (walletProperties.wallet == Object.keys(walletConstants)[2] && walletProperties.network && walletProperties.path) {
-            const { amount, nodeId, startTime, endTime } = await getDetailsForDelegation(taskConstants[task])
-            const argsExport = [...baseargv.slice(0, 2), "transaction", taskConstants[task], '-n', `${nodeId}`, `--network=${walletProperties.network}`, '-a', `${amount}`, '-s', `${startTime}`, '-e', `${endTime}`, `--env-path=${walletProperties.path}`, "--get-hacked"]
-            await program.parseAsync(argsExport)
-        }
-        else if (walletProperties.wallet == Object.keys(walletConstants)[0] && fileExists("ctx.json")) {
+
+        if (walletProperties.wallet == Object.keys(walletConstants)[0] && fileExists("ctx.json")) {
             const { network: ctxNetwork, derivationPath: ctxDerivationPath } = readInfoFromCtx("ctx.json")
             if (ctxNetwork && ctxDerivationPath) {
                 const { amount, nodeId, startTime, endTime } = await getDetailsForDelegation(taskConstants[task])
@@ -95,6 +102,11 @@ export async function interactiveCli(baseargv: string[]) {
             } else {
                 console.log("Missing params in ctx file")
             }
+        }
+        else if (walletProperties.wallet == Object.keys(walletConstants)[2] && walletProperties.network && walletProperties.path) {
+            const { amount, nodeId, startTime, endTime } = await getDetailsForDelegation(taskConstants[task])
+            const argsExport = [...baseargv.slice(0, 2), "transaction", taskConstants[task], '-n', `${nodeId}`, `--network=${walletProperties.network}`, '-a', `${amount}`, '-s', `${startTime}`, '-e', `${endTime}`, `--env-path=${walletProperties.path}`, "--get-hacked"]
+            await program.parseAsync(argsExport)
         }
         else {
             console.log("only pvt key and ledger supported for delegation right now")
