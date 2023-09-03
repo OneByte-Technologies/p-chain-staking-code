@@ -23,12 +23,12 @@ export async function interactiveCli(baseargv: string[]) {
     if (Object.keys(taskConstants).slice(0, 4).includes(task.toString())) {
 
         if (walletProperties.wallet == Object.keys(walletConstants)[0] || walletProperties.wallet == Object.keys(walletConstants)[1]) {
-            const args = [...baseargv.slice(0, 2), "info", taskConstants[task], `--ctx-file=ctx.json`]
-            await program.parseAsync(args)
+            const argsInfo = [...baseargv.slice(0, 2), "info", taskConstants[task], `--ctx-file=ctx.json`]
+            await program.parseAsync(argsInfo)
         }
         else if (walletProperties.wallet == Object.keys(walletConstants)[2] && walletProperties.path && walletProperties.network) {
-            const args = [...baseargv.slice(0, 2), "info", taskConstants[task], `--env-path=${walletProperties.path}`, `--network=${walletProperties.network}`, "--get-hacked"]
-            await program.parseAsync(args)
+            const argsInfo = [...baseargv.slice(0, 2), "info", taskConstants[task], `--env-path=${walletProperties.path}`, `--network=${walletProperties.network}`, "--get-hacked"]
+            await program.parseAsync(argsInfo)
         }
         else {
             console.log("Incorrect arguments passed!")
@@ -69,14 +69,14 @@ export async function interactiveCli(baseargv: string[]) {
                         const argsImport = [...baseargv.slice(0, 2), "transaction", `import${taskConstants[task].slice(-2)}`, "-i", `${txnId.id}`]
                         await program.parseAsync(argsImport)
                     }
-                    const argsSign = [...baseargv.slice(0, 2), "forDefi", "sign", "-i", `${txnId.id}`]
+                    const argsSign = makeForDefiArguments("sign", baseargv, txnId.id)
                     await program.parseAsync(argsSign)
                 }
                 else {
                     const txnId = await prompts.transactionId()
-                    const argsFetch = [...baseargv.slice(0, 2), "forDefi", "fetch", "-i", `${txnId.id}`]
+                    const argsFetch = makeForDefiArguments("fetch", baseargv, txnId.id)
                     await program.parseAsync(argsFetch)
-                    const argsSend = [...baseargv.slice(0, 2), "send", "-i", `${txnId.id}`]
+                    const argsSend = makeForDefiArguments("send", baseargv, txnId.id)
                     await program.parseAsync(argsSend)
                 }
             }
@@ -128,16 +128,41 @@ export async function interactiveCli(baseargv: string[]) {
             const { network: ctxNetwork, derivationPath: ctxDerivationPath } = readInfoFromCtx("ctx.json")
             if (ctxNetwork && ctxDerivationPath) {
                 const { amount, nodeId, startTime, endTime } = await getDetailsForDelegation(taskConstants[task])
-                const argsExport = [...baseargv.slice(0, 2), "transaction", taskConstants[task], '-n', `${nodeId}`, '-a', `${amount}`, '-s', `${startTime}`, '-e', `${endTime}`, "--blind", "true", "--derivation-path", ctxDerivationPath, `--network=${ctxNetwork}`, "--ledger"]
-                await program.parseAsync(argsExport)
+                const argsDelegate = [...baseargv.slice(0, 2), "transaction", taskConstants[task], '-n', `${nodeId}`, '-a', `${amount}`, '-s', `${startTime}`, '-e', `${endTime}`, "--blind", "true", "--derivation-path", ctxDerivationPath, `--network=${ctxNetwork}`, "--ledger"]
+                await program.parseAsync(argsDelegate)
             } else {
+                console.log("Missing params in ctx file")
+            }
+        }
+        else if (walletProperties.wallet == Object.keys(walletConstants)[1] && fileExists("ctx.json")) {
+            const { network: ctxNetwork, vaultId: ctxVaultId, publicKey: ctxPublicKey } = readInfoFromCtx("ctx.json")
+            if (ctxNetwork && ctxVaultId && ctxPublicKey) {
+                const isContinue = await prompts.forDefiContinue()
+                if (!isContinue.isContinue) {
+                    const txnId = await prompts.transactionId()
+                    const { amount, nodeId, startTime, endTime } = await getDetailsForDelegation(taskConstants[task])
+                    const argsDelegate = [...baseargv.slice(0, 2), "transaction", taskConstants[task], '-n', `${nodeId}`, `--network=${walletProperties.network}`, '-a', `${amount}`, '-s', `${startTime}`, '-e', `${endTime}`, "-i", `${txnId.id}`]
+                    await program.parseAsync(argsDelegate)
+
+                    const argsSign = makeForDefiArguments("sign", baseargv, txnId.id)
+                    await program.parseAsync(argsSign)
+                }
+                else {
+                    const txnId = await prompts.transactionId()
+                    const argsFetch = makeForDefiArguments("fetch", baseargv, txnId.id)
+                    await program.parseAsync(argsFetch)
+                    const argsSend = makeForDefiArguments("send", baseargv, txnId.id)
+                    await program.parseAsync(argsSend)
+                }
+            }
+            else {
                 console.log("Missing params in ctx file")
             }
         }
         else if (walletProperties.wallet == Object.keys(walletConstants)[2] && walletProperties.network && walletProperties.path) {
             const { amount, nodeId, startTime, endTime } = await getDetailsForDelegation(taskConstants[task])
-            const argsExport = [...baseargv.slice(0, 2), "transaction", taskConstants[task], '-n', `${nodeId}`, `--network=${walletProperties.network}`, '-a', `${amount}`, '-s', `${startTime}`, '-e', `${endTime}`, `--env-path=${walletProperties.path}`, "--get-hacked"]
-            await program.parseAsync(argsExport)
+            const argsDelegate = [...baseargv.slice(0, 2), "transaction", taskConstants[task], '-n', `${nodeId}`, `--network=${walletProperties.network}`, '-a', `${amount}`, '-s', `${startTime}`, '-e', `${endTime}`, `--env-path=${walletProperties.path}`, "--get-hacked"]
+            await program.parseAsync(argsDelegate)
         }
         else {
             console.log("only pvt key and ledger supported for delegation right now")
@@ -304,4 +329,20 @@ async function getDetailsForDelegation(task: string): Promise<DelegationDetailsI
         }
     }
     return delegationDetails
+}
+
+function makeForDefiArguments(txnType: string, baseargv: string[], txnId: string) {
+    if (txnType == "sign") {
+        const argsSign = [...baseargv.slice(0, 2), "forDefi", "sign", "-i", `${txnId}`]
+        return argsSign
+    }
+    if (txnType == "fetch") {
+        const argsFetch = [...baseargv.slice(0, 2), "forDefi", "fetch", "-i", `${txnId}`]
+        return argsFetch
+    }
+    if (txnType == "send") {
+        const argsSign = [...baseargv.slice(0, 2), "send", "-i", `${txnId}`]
+        return argsSign
+    }
+    return []
 }
