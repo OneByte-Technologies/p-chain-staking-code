@@ -179,5 +179,38 @@ export const prompts = {
             },
         ];
         return inquirer.prompt(questions);
-    }
+    },
+
+    forDefiTxn: async () => {
+        const questions = [
+            {
+                type: 'list',
+                name: 'txn',
+                message: `${colorCodes.magentaColor}Which transaction do you want to do?${colorCodes.resetColor}`,
+                choices: [
+                    "Export funds",
+                    "Import funds"
+                ],
+            },
+        ];
+        return inquirer.prompt(questions);
+    },
+
+    forDefiContinue: async () => {
+        const questions = [
+            {
+                type: 'list',
+                name: 'isContinue',
+                message: `${colorCodes.magentaColor}Choose an option${colorCodes.resetColor}`,
+                choices: [
+                    "Start new transaction",
+                    "Continue existing transaction"
+                ],
+                filter: (val: string) => {
+                    return val.includes("existing") ? true : false
+                }
+            },
+        ];
+        return inquirer.prompt(questions);
+    },
 }

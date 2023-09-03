@@ -53,6 +53,37 @@ export async function interactiveCli(baseargv: string[]) {
                 console.log("Missing params in ctx file")
             }
         }
+        else if (walletProperties.wallet == Object.keys(walletConstants)[1] && fileExists("ctx.json")) {
+            const { network: ctxNetwork, vaultId: ctxVaultId, publicKey: ctxPublicKey } = readInfoFromCtx("ctx.json")
+            if (ctxNetwork && ctxVaultId && ctxPublicKey) {
+                const isContinue = await prompts.forDefiContinue()
+                if (!isContinue.isContinue) {
+                    const txnType = await prompts.forDefiTxn()
+                    const txnId = await prompts.transactionId()
+                    if (txnType.txn.includes("Export")) {
+                        const amount = await prompts.amount()
+                        const argsExport = [...baseargv.slice(0, 2), "transaction", `export${taskConstants[task].slice(-2)}`, '-a', `${amount.amount}`, "-i", `${txnId.id}`]
+                        await program.parseAsync(argsExport)
+                    }
+                    else if (txnType.txn.includes("Import")) {
+                        const argsImport = [...baseargv.slice(0, 2), "transaction", `import${taskConstants[task].slice(-2)}`, "-i", `${txnId.id}`]
+                        await program.parseAsync(argsImport)
+                    }
+                    const argsSign = [...baseargv.slice(0, 2), "forDefi", "sign", "-i", `${txnId.id}`]
+                    await program.parseAsync(argsSign)
+                }
+                else {
+                    const txnId = await prompts.transactionId()
+                    const argsFetch = [...baseargv.slice(0, 2), "forDefi", "fetch", "-i", `${txnId.id}`]
+                    await program.parseAsync(argsFetch)
+                    const argsSend = [...baseargv.slice(0, 2), "send", "-i", `${txnId.id}`]
+                    await program.parseAsync(argsSend)
+                }
+            }
+            else {
+                console.log("Missing params in ctx file")
+            }
+        }
         else if (walletProperties.wallet == Object.keys(walletConstants)[2] && walletProperties.network && walletProperties.path) {
             const amount = await prompts.amount()
             const argsExport = [...baseargv.slice(0, 2), "transaction", `export${taskConstants[task].slice(-2)}`, '-a', `${amount.amount}`, `--env-path=${walletProperties.path}`, `--network=${walletProperties.network}`, "--get-hacked"]
@@ -63,7 +94,7 @@ export async function interactiveCli(baseargv: string[]) {
             await program.parseAsync(argsImport)
         }
         else {
-            console.log("only pvt key and ledger supported for txns right now")
+            console.log("Incorrect arguments passed!")
         }
     }
 
