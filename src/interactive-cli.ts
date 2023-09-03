@@ -105,16 +105,41 @@ export async function interactiveCli(baseargv: string[]) {
             const { network: ctxNetwork, derivationPath: ctxDerivationPath } = readInfoFromCtx("ctx.json")
             const { amount, nodeId, startTime, endTime, delegationFee } = await getDetailsForDelegation(taskConstants[task])
             if (ctxNetwork && ctxDerivationPath && delegationFee) {
-                const argsExport = [...baseargv.slice(0, 2), "transaction", taskConstants[task], '-n', `${nodeId}`, '-a', `${amount}`, '-s', `${startTime}`, '-e', `${endTime}`, '--delegation-fee', `${delegationFee}`, "--blind", "true", "--derivation-path", ctxDerivationPath, `--network=${ctxNetwork}`, "--ledger"]
-                await program.parseAsync(argsExport)
+                const argsValidator = [...baseargv.slice(0, 2), "transaction", taskConstants[task], '-n', `${nodeId}`, '-a', `${amount}`, '-s', `${startTime}`, '-e', `${endTime}`, '--delegation-fee', `${delegationFee}`, "--blind", "true", "--derivation-path", ctxDerivationPath, `--network=${ctxNetwork}`, "--ledger"]
+                await program.parseAsync(argsValidator)
             } else {
                 console.log("Missing values for certain params")
             }
         }
+        else if (walletProperties.wallet == Object.keys(walletConstants)[1] && fileExists("ctx.json")) {
+            const { network: ctxNetwork, vaultId: ctxVaultId, publicKey: ctxPublicKey } = readInfoFromCtx("ctx.json")
+            if (ctxNetwork && ctxVaultId && ctxPublicKey) {
+                const isContinue = await prompts.forDefiContinue()
+                if (!isContinue.isContinue) {
+                    const txnId = await prompts.transactionId()
+                    const { amount, nodeId, startTime, endTime, delegationFee } = await getDetailsForDelegation(taskConstants[task])
+                    const argsValidator = [...baseargv.slice(0, 2), "transaction", taskConstants[task], '-n', `${nodeId}`, `--network=${walletProperties.network}`, '-a', `${amount}`, '-s', `${startTime}`, '-e', `${endTime}`, '--delegation-fee', `${delegationFee}`, "-i", `${txnId.id}`]
+                    await program.parseAsync(argsValidator)
+
+                    const argsSign = makeForDefiArguments("sign", baseargv, txnId.id)
+                    await program.parseAsync(argsSign)
+                }
+                else {
+                    const txnId = await prompts.transactionId()
+                    const argsFetch = makeForDefiArguments("fetch", baseargv, txnId.id)
+                    await program.parseAsync(argsFetch)
+                    const argsSend = makeForDefiArguments("send", baseargv, txnId.id)
+                    await program.parseAsync(argsSend)
+                }
+            }
+            else {
+                console.log("Missing params in ctx file")
+            }
+        }
         else if (walletProperties.wallet == Object.keys(walletConstants)[2] && walletProperties.network && walletProperties.path) {
             const { amount, nodeId, startTime, endTime, delegationFee } = await getDetailsForDelegation(taskConstants[task])
-            const argsExport = [...baseargv.slice(0, 2), "transaction", taskConstants[task], '-n', `${nodeId}`, `--network=${walletProperties.network}`, '-a', `${amount}`, '-s', `${startTime}`, '-e', `${endTime}`, '--delegation-fee', `${delegationFee}`, `--env-path=${walletProperties.path}`, "--get-hacked"]
-            await program.parseAsync(argsExport)
+            const argsValidator = [...baseargv.slice(0, 2), "transaction", taskConstants[task], '-n', `${nodeId}`, `--network=${walletProperties.network}`, '-a', `${amount}`, '-s', `${startTime}`, '-e', `${endTime}`, '--delegation-fee', `${delegationFee}`, `--env-path=${walletProperties.path}`, "--get-hacked"]
+            await program.parseAsync(argsValidator)
         }
         else {
             console.log("only pvt key and ledger supported for staking right now")
