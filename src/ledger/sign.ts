@@ -72,13 +72,14 @@ export async function signId(id: string, derivationPath: string, blind: boolean 
  * @param file - file name
  * @param derivationPath - path to the accounts in ledger
  * @param blind - default true
+ * @param _ledgerSign - for testcase implementation, need to pass ledgerSign
  */
-export async function sign(file: string, derivationPath: string, blind: boolean = true) {
+export async function sign(file: string, derivationPath: string, blind: boolean = true, _ledgerSign = ledgerSign) {
 	logInfo(`Please sign the transaction on your ledger device...`)
     const json = fs.readFileSync(file, 'utf8')
     const tx: SignedTxJson = JSON.parse(json)
     if (tx && tx.signatureRequests && tx.signatureRequests.length > 0) {
-        const { signature } = await ledgerSign(tx, derivationPath, blind)
+        const { signature } = await _ledgerSign(tx, derivationPath, blind)
         tx.signature = signature
         let outFile = file.replace('unsignedTx.json', 'signedTx.json')
         if (outFile === file) {

@@ -1,54 +1,210 @@
-import { ledgerSign, signId } from '../../../src/ledger/sign';
+import { ledgerSign, signId, sign } from '../../../src/ledger/sign';
 import TransportNodeHid from '@ledgerhq/hw-transport-node-hid';
 import AvalancheApp from '@avalabs/hw-app-avalanche';
 import { sha256 } from 'ethereumjs-util';
-
+import fixatures from '../../fixtures/ledger/sign.data';
+import fs from 'fs';
 jest.mock('@avalabs/hw-app-avalanche');
 jest.mock('@ledgerhq/hw-transport-node-hid');
 jest.mock('ethereumjs-util');
+
 describe('ledger/sign testcases', () => {
   afterEach(() => {
     jest.clearAllMocks();
   });
+  describe('Testcases for ledgerSign', () => {
+    test('should successfully sign a blind transaction', async () => {
+      // Mock the necessary dependencies and their responses.
+      const mockTransport = {
+        open: jest.fn().mockResolvedValue({})
+      };
+      const mockAvalanche = {
+        signHash: jest.fn().mockResolvedValue({
+          errorMessage: 'No errors',
+          returnCode: 0,
+          signatures: {
+            get: jest.fn().mockResolvedValue('mocksign')
+          }
+        })
+      };
+      //@ts-ignore
+      TransportNodeHid.open.mockResolvedValue(mockTransport);
+      //@ts-ignore
+      AvalancheApp.mockImplementation(() => mockAvalanche);
+      //@ts-ignore
+      sha256.mockReturnValue(Buffer.from(fixatures.ledgerSign.mock.hash, 'hex'));
 
-  it('should successfully sign a blind transaction', async () => {
-    // Mock the necessary dependencies and their responses.
-    const mockTransport = {
-      open: jest.fn().mockResolvedValue({})
-    };
-    const mockAvalanche = {
-      signHash: jest.fn().mockResolvedValue({
-        errorMessage: 'No errors',
-        returnCode: 0,
-        signatures: {
-          get: jest.fn().mockResolvedValue('mocksign')
-        }
-      })
-    };
-    //@ts-ignore
-    TransportNodeHid.open.mockResolvedValue(mockTransport);
-    //@ts-ignore
-    AvalancheApp.mockImplementation(() => mockAvalanche);
-    //@ts-ignore
-    sha256.mockReturnValue(Buffer.from('mockedMessageHash', 'hex'));
+      const mockTx = {
+        signatureRequests: [{ message: fixatures.ledgerSign.mock.message }],
+        unsignedTransactionBuffer: fixatures.ledgerSign.mock.mockedUnsignedTxBuffer
+      };
+      jest
+        .spyOn(require('../../../src/ledger/utils'), 'recoverTransactionPublicKey')
+        .mockReturnValue(fixatures.ledgerSign.mock.publicKey);
+      jest
+        .spyOn(require('../../../src/ledger/utils'), 'recoverTransactionSigner')
+        .mockReturnValue(fixatures.ledgerSign.mock.address);
+      //@ts-ignore
+      const result = await ledgerSign(mockTx, fixatures.ledgerSign.mock.path, true);
+      expect(result).toHaveProperty('address', fixatures.ledgerSign.mock.address);
 
-    const mockTx = {
-      signatureRequests: [{ message: 'mockedMessage' }],
-      unsignedTransactionBuffer: 'mockedUnsignedTxBuffer'
-    };
-    jest
-      .spyOn(require('../../../src/ledger/utils'), 'recoverTransactionPublicKey')
-      .mockReturnValue(
-        '04423fb5371af0e80750a6481bf9b4adcf2cde38786c4e613855b4f629f8c45ded6720e3335d1110c112c6d1c17fcbb23b9acc29ae5750a27637d385991af15190'
+      // Verify that the required functions were called.
+      expect(AvalancheApp).toHaveBeenCalled();
+    });
+
+    test('should throw error', async () => {
+      try {
+        // Mock the necessary dependencies and their responses.
+        const mockTransport = {
+          open: jest.fn().mockResolvedValue({})
+        };
+        const mockAvalanche = {
+          signHash: jest.fn().mockResolvedValue({
+            errorMessage: 'Dummy error',
+            returnCode: 0,
+            signatures: {
+              get: jest.fn().mockResolvedValue('mocksign')
+            }
+          })
+        };
+        //@ts-ignore
+        TransportNodeHid.open.mockResolvedValue(mockTransport);
+        //@ts-ignore
+        AvalancheApp.mockImplementation(() => mockAvalanche);
+        //@ts-ignore
+        sha256.mockReturnValue(Buffer.from(fixatures.ledgerSign.mock.hash, 'hex'));
+
+        const mockTx = {
+          signatureRequests: [{ message: fixatures.ledgerSign.mock.message }],
+          unsignedTransactionBuffer: fixatures.ledgerSign.mock.mockedUnsignedTxBuffer
+        };
+        jest
+          .spyOn(require('../../../src/ledger/utils'), 'recoverTransactionPublicKey')
+          .mockReturnValue(fixatures.ledgerSign.mock.publicKey);
+        jest
+          .spyOn(require('../../../src/ledger/utils'), 'recoverTransactionSigner')
+          .mockReturnValue(fixatures.ledgerSign.mock.address);
+        //@ts-ignore
+        await ledgerSign(mockTx, fixatures.ledgerSign.mock.path, true);
+      } catch (error) {
+        expect(error).not.toBeNull();
+      }
+    });
+    test('should successfully sign a non-blind transaction', async () => {
+      // Mock the necessary dependencies and their responses.
+      const mockTransport = {
+        open: jest.fn().mockResolvedValue({})
+      };
+      const mockAvalanche = {
+        sign: jest.fn().mockResolvedValue({
+          errorMessage: 'No errors',
+          returnCode: 0,
+          signatures: {
+            get: jest.fn().mockResolvedValue('mocksign')
+          }
+        })
+      };
+      //@ts-ignore
+      TransportNodeHid.open.mockResolvedValue(mockTransport);
+      //@ts-ignore
+      AvalancheApp.mockImplementation(() => mockAvalanche);
+      //@ts-ignore
+      sha256.mockReturnValue(Buffer.from(fixatures.ledgerSign.mock.hash, 'hex'));
+
+      const mockTx = {
+        signatureRequests: [{ message: fixatures.ledgerSign.mock.message }],
+        unsignedTransactionBuffer: fixatures.ledgerSign.mock.mockedUnsignedTxBuffer
+      };
+      jest
+        .spyOn(require('../../../src/ledger/utils'), 'recoverTransactionPublicKey')
+        .mockReturnValue(fixatures.ledgerSign.mock.publicKey);
+      jest
+        .spyOn(require('../../../src/ledger/utils'), 'recoverTransactionSigner')
+        .mockReturnValue(fixatures.ledgerSign.mock.address);
+      //@ts-ignore
+      const result = await ledgerSign(mockTx, fixatures.ledgerSign.mock.path, false);
+      expect(result).toHaveProperty('address', fixatures.ledgerSign.mock.address);
+
+      // Verify that the required functions were called.
+      expect(AvalancheApp).toHaveBeenCalled();
+    });
+
+    test('should throw error for non-blind transaction', async () => {
+      try {
+        // Mock the necessary dependencies and their responses.
+        const mockTransport = {
+          open: jest.fn().mockResolvedValue({})
+        };
+        const mockAvalanche = {
+          sign: jest.fn().mockResolvedValue({
+            errorMessage: 'Dummy error',
+            returnCode: 0,
+            signatures: {
+              get: jest.fn().mockResolvedValue('mocksign')
+            }
+          })
+        };
+        //@ts-ignore
+        TransportNodeHid.open.mockResolvedValue(mockTransport);
+        //@ts-ignore
+        AvalancheApp.mockImplementation(() => mockAvalanche);
+        //@ts-ignore
+        sha256.mockReturnValue(Buffer.from(fixatures.ledgerSign.mock.hash, 'hex'));
+
+        const mockTx = {
+          signatureRequests: [{ message: fixatures.ledgerSign.mock.message }],
+          unsignedTransactionBuffer: fixatures.ledgerSign.mock.mockedUnsignedTxBuffer
+        };
+        jest
+          .spyOn(require('../../../src/ledger/utils'), 'recoverTransactionPublicKey')
+          .mockReturnValue(fixatures.ledgerSign.mock.publicKey);
+        jest
+          .spyOn(require('../../../src/ledger/utils'), 'recoverTransactionSigner')
+          .mockReturnValue(fixatures.ledgerSign.mock.address);
+        //@ts-ignore
+        await ledgerSign(mockTx, fixatures.ledgerSign.mock.path, false);
+      } catch (error) {
+        expect(error).not.toBeNull();
+      }
+    });
+  });
+
+  describe('Testcases for sign', () => {
+    jest.mock('fs');
+
+    test('Should sign the transaction', async () => {
+      const jsonContent = JSON.stringify(fixatures.sign.mock.valid.jsonContent);
+
+      const ledgerSignMock = jest.fn().mockResolvedValue({
+        signature: fixatures.sign.mock.valid.signature
+      });
+      jest.spyOn(fs, 'readFileSync').mockReturnValue(jsonContent);
+      await sign(
+        fixatures.sign.mock.valid.file,
+        fixatures.sign.mock.valid.path,
+        true,
+        ledgerSignMock
       );
-    jest
-      .spyOn(require('../../../src/ledger/utils'), 'recoverTransactionSigner')
-      .mockReturnValue('0xfa32C77AA014584bB9c3F69d8D1d74B8844e1A92');
-    //@ts-ignore
-    const result = await ledgerSign(mockTx, "m/44'/9000'/0'/0/0", true);
-    expect(result).toHaveProperty('address', '0xfa32C77AA014584bB9c3F69d8D1d74B8844e1A92');
+      expect(ledgerSignMock).toHaveBeenCalledWith(expect.any(Object), expect.any(String), true);
+    });
 
-    // Verify that the required functions were called.
-    expect(AvalancheApp).toHaveBeenCalled();
+    test('Should throw error for empty request array', async () => {
+      try {
+        const jsonContent = JSON.stringify(fixatures.sign.mock.invalid.jsonContent);
+
+        const ledgerSignMock = jest.fn().mockResolvedValue({
+          signature: fixatures.sign.mock.valid.signature
+        });
+        jest.spyOn(fs, 'readFileSync').mockReturnValue(jsonContent);
+        await sign(
+          fixatures.sign.mock.valid.file,
+          fixatures.sign.mock.valid.path,
+          true,
+          ledgerSignMock
+        );
+      } catch (error) {
+        expect(error).not.toBeNull();
+      }
+    });
   });
 });
