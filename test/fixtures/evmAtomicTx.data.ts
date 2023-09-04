@@ -10,7 +10,7 @@ const fixtures = {
     input: { amount: new BN(100), fee: new BN(10), nonce: 2 },
     output: {
       address: '0xfa32c77aa014584bb9c3f69d8d1d74b8844e1a92',
-      assetId: '2gys8VD6ibh6NCju1ZTyVHdjkyDSQTEWUHfZHRDopivofVahbX',
+      assetId: 'HK58c7FvFK79cbFsdFf1qVL5bVwQcCRkzZN5Ked8uZsyheeEN',
       nonce: 2
     }
   },

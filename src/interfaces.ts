@@ -95,9 +95,7 @@ export interface ScreenConstantsInterface {
 export interface ConnectWalletInterface {
   wallet: string;
   path?: string;
-  publicKey?: string;
   network?: string;
-  isCreateCtx?: boolean;
 }
 
 /**
@@ -109,4 +107,16 @@ export interface DerivedAddress {
   publicKey: string,
   balance?: string,
   derivationPath: string
+}
+
+/**
+ * Represents the properties returned from the "getDetailsForDelegation" function
+ * @interface DelegationDetailsInterface
+ */
+export interface DelegationDetailsInterface {
+  amount: string,
+  nodeId: string,
+  startTime: string,
+  endTime: string
+  delegationFee?: string
 }

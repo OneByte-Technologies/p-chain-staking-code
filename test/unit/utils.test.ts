@@ -38,6 +38,7 @@ import { UnsignedTx as EvmUnsignedTx, UTXOSet } from '@flarenetwork/flarejs/dist
 import { UnsignedTx as PvmUnsignedTx } from '@flarenetwork/flarejs/dist/apis/platformvm';
 import fixtures from '../fixtures/utils.data';
 import { serialize, covertBNToSting, compareValues } from '../helper/testHelpers';
+
 describe('Unit Test Cases for utils', () => {
   // public keys and bech32 addresses
 

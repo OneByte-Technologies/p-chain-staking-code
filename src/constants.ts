@@ -15,7 +15,7 @@ import {
 /**
  * @description - parses the file and returns the context of ctx.json
  * @param ctxFile - path to the context file
- * @returns
+ * @returns - context
  */
 export function readContextFile(ctxFile: string): ContextFile {
   const file = fs.readFileSync(ctxFile, 'utf8')
@@ -37,11 +37,21 @@ export function contextEnv(path: string, network: string): Context {
     process.env.PRIVATE_KEY_CB58)
 }
 
+/**
+ * @description - returns context from the file
+ * @param ctxFile - path to the context file
+ * @returns returns the context
+ */
 export function contextFile(ctxFile: string): Context {
   const ctx = readContextFile(ctxFile)
   return getContext(ctx.network, ctx.publicKey)
 }
 
+/**
+ * @description - returns the network from the context file
+ * @param ctxFile - context file
+ * @returns returns the network from the context
+ */
 export function networkFromContextFile(ctxFile: string): string {
   const ctx = readContextFile(ctxFile)
   return ctx.network
@@ -74,7 +84,7 @@ export const networkMapping = {
  * @param publicKey - public key
  * @param privateKeyHex - private key in hex format
  * @param privateKeyCB58 - private key in cb58 format
- * @returns
+ * @returns context
  */
 export function getContext(network: string, publicKey?: string, privateKeyHex?: string, privateKeyCB58?: string): Context {
   return context(getConfig(network), publicKey, privateKeyHex, privateKeyCB58)

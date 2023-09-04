@@ -1,6 +1,15 @@
 import { BN } from '@flarenetwork/flarejs/dist';
 import { exportTxCP } from '../../src/evmAtomicTx';
 import { contextEnv } from '../../src/constants';
+<<<<<<< HEAD
+=======
+
+/**
+ * @description - serializes the buffer data
+ * @param bufferData - buffer data
+ * @returns returns serialised data
+ */
+>>>>>>> a69986ab47e55ac44bf11b244ad9d42cba5d1c5e
 export const serialize = (bufferData: Buffer[]) => {
   const serializedData = JSON.stringify(bufferData, (key, value) => {
     if (Buffer.isBuffer(value)) {
@@ -12,14 +21,30 @@ export const serialize = (bufferData: Buffer[]) => {
   return serializedData;
 };
 
+/**
+ * @description: converts a data to big number
+ * @param data - data of type any
+ * @returns - returns it in big number format
+ */
 export const covertBNToSting = (data: any): string => {
   return data instanceof BN ? data.toString() : data;
 };
 
+/**
+ * @description - converts an array of data to big integer
+ * @param arr - array of entities
+ * @returns - converts each to big number and returns the array
+ */
 export const convertArrayBNToString = (arr: any[]): any[] => {
   return arr.map((item) => (item instanceof BN ? item.toString() : item));
 };
 
+/**
+ * @description - compares two big number
+ * @param a - first big number
+ * @param b - second big number
+ * @returns - returns if both of them are equal or not
+ */
 export const compareValues = (a: any, b: any): boolean => {
   if (a == undefined && b == undefined) {
     return true;
@@ -36,6 +61,12 @@ export const compareValues = (a: any, b: any): boolean => {
   return a === b;
 };
 
+<<<<<<< HEAD
+=======
+/**
+ * @description - transfers funds from C to P chain
+ */
+>>>>>>> a69986ab47e55ac44bf11b244ad9d42cba5d1c5e
 export const tranferFundsFromCtoP = async () => {
   try {
     let ctx = contextEnv('.env', 'localflare');

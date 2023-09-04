@@ -14,7 +14,7 @@ type ExportPCParams = [
 ]
 
 /**
- * Import funds exported from C-chain to P-chain to P-chain
+ * @description Import funds exported from C-chain to P-chain to P-chain
  * @param ctx - context with constants initialized from user keys
  */
 export async function importTxCP(ctx: Context, threshold?: number): Promise<{ txid: string }> {
@@ -26,7 +26,7 @@ export async function importTxCP(ctx: Context, threshold?: number): Promise<{ tx
 }
 
 /**
- * Export funds from P-chain to C-chain.
+ * @description Export funds from P-chain to C-chain.
  * @param ctx - context with constants initialized from user keys
  * @param amount - amount to export (if left undefined, it exports all funds on P-chain)
  */
@@ -39,7 +39,7 @@ export async function exportTxPC(ctx: Context, amount?: BN, threshold?: number):
 }
 
 /**
- * Get unsigned transaction for import from C-chain to P-chain.
+ * @description Get unsigned transaction for import from C-chain to P-chain.
  * @param ctx - context with constants initialized from user keys
  */
 export async function getUnsignedImportTxCP(ctx: Context, threshold?: number): Promise<UnsignedTxJson> {
@@ -54,7 +54,7 @@ export async function getUnsignedImportTxCP(ctx: Context, threshold?: number): P
 }
 
 /**
- * Get unsigned transaction for export from C-chain to P-chain.
+ * @description Get unsigned transaction for export from C-chain to P-chain.
  * @param ctx - context with constants initialized from user keys
  * @param amount - amount to export (if left undefined, it exports all funds on P-chain)
  */
@@ -70,7 +70,7 @@ export async function getUnsignedExportTxPC(ctx: Context, amount?: BN, threshold
 }
 
 /**
- * Issues a signed P-chain transation
+ * @description Issues a signed P-chain transation
  * @param ctx - context with constants initialized from user keys
  * @param id - id associated with the transaction
  */
@@ -84,7 +84,7 @@ export async function issueSignedPvmTx(ctx: Context, signedTxJson: SignedTxJson)
 }
 
 /**
- * Returns the parameters related to importing funds from C to P chain
+ * @description Returns the parameters related to importing funds from C to P chain
  * @param ctx - context file aka ctx.json
  * @param threshold
  * @returns the parameters
