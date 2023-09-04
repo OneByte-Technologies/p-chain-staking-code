@@ -46,3 +46,5 @@ a. For `ledger/sign` - `yarn run ledger-sign-testcase`
 b. For `ledger/key` - `yarn run ledger-key-testcase`
 
 c. For `ledger/utils` - `yarn run ledger-utils-testcase`
+
+d. For `cli` - `yarn run cli-testcase`
