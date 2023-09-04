@@ -253,6 +253,29 @@ export function readSignedTxJson(id: string): SignedTxJson {
   return resp
 }
 
+export function addFlagForSentSignedTx(id: string) {
+  const fname = `${forDefiDirectory}/${forDefiSignedTxnDirectory}/${id}.signedTx.json`
+  if (!fs.existsSync(fname)) {
+    throw new Error(`signedTx file ${fname} does not exist`)
+  }
+  const serialization = fs.readFileSync(fname).toString()
+  const txObj = JSON.parse(serialization) as SignedTxJson
+  txObj.isSentToChain = true
+
+  fs.writeFileSync(`${forDefiDirectory}/${forDefiSignedTxnDirectory}/${id}.signedTx.json`, JSON.stringify(txObj), "utf8")
+}
+
+export function isAlreadySentToChain(id: string): boolean {
+  const fname = `${forDefiDirectory}/${forDefiSignedTxnDirectory}/${id}.signedTx.json`
+  if (!fs.existsSync(fname)) {
+    throw new Error(`signedTx file ${fname} does not exist`)
+  }
+  const serialization = fs.readFileSync(fname).toString()
+  const txObj = JSON.parse(serialization) as SignedTxJson
+
+  return txObj.isSentToChain ? true : false
+}
+
 // withdrawal
 export function saveUnsignedWithdrawalTx(unsignedTx: UnsignedWithdrawalTxJson, id: string): void {
   const fname = `${forDefiDirectory}/${forDefiUnsignedTxnDirectory}/${id}.unsignedTx.json`
