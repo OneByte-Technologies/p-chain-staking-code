@@ -5,7 +5,7 @@ import AvalancheApp from '@avalabs/hw-app-avalanche';
 
 jest.mock('@avalabs/hw-app-avalanche');
 jest.mock('@ledgerhq/hw-transport-node-hid');
-describe('ledger/key.ts Testcases', () => {
+describe('ledger/key Testcases', () => {
   beforeEach(() => {
     // Reset mock function calls before each test
     jest.clearAllMocks();

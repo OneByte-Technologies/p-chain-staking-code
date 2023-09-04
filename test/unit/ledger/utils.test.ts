@@ -7,7 +7,7 @@ import {
 } from '../../../src/ledger/utils';
 import fixtures from '../../fixtures/ledger/utils.data';
 
-describe('ledger/utils Testcases', () => {
+describe('ledger/utils testcases', () => {
   describe('privateKeyToPublicKeyEncoding Testcases', () => {
     test('Should convert to encoded pubickey', async () => {
       const publicKeyEncoding = await privateKeyToPublicKeyEncoding(
