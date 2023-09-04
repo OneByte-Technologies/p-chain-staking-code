@@ -10,10 +10,7 @@ import {
 import { contextEnv } from '../../src/constants';
 import { Context } from '../../src/interfaces';
 import fixtures from '../fixtures/evmAtomicTx.data';
-<<<<<<< HEAD
-=======
 
->>>>>>> a69986ab47e55ac44bf11b244ad9d42cba5d1c5e
 describe('evmAtomicTx Testcases', () => {
   describe('getImportPCParams', () => {
     test('Should return the params with the fees', async () => {
@@ -51,11 +48,7 @@ describe('evmAtomicTx Testcases', () => {
 
   describe('issueSignedEvmTx function', () => {
     //@ts-ignore
-<<<<<<< HEAD
-    test('issues a signed EVM transaction', async () => {
-=======
     it('issues a signed EVM transaction', async () => {
->>>>>>> a69986ab47e55ac44bf11b244ad9d42cba5d1c5e
       let ctx = contextEnv('.env', 'localflare');
       const utils = require('../../src/utils');
       const spy = jest.spyOn(utils, 'expandSignature');

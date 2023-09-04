@@ -174,7 +174,6 @@ describe('pvmAtomicTx testcases', () => {
     });
   });
 
-<<<<<<< HEAD
   describe('issueSignedPvmTx', () => {
     afterEach(() => {
       jest.clearAllMocks(); // Clear mocks after each test case
@@ -192,6 +191,4 @@ describe('pvmAtomicTx testcases', () => {
       const result = issueSignedPvmTx(ctx, fixtures.issueSignedPvmTx.mock.signedTxJson);
     });
   });
-=======
->>>>>>> a69986ab47e55ac44bf11b244ad9d42cba5d1c5e
 });

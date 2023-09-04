@@ -1,15 +1,12 @@
 import { BN } from '@flarenetwork/flarejs/dist';
 import { exportTxCP } from '../../src/evmAtomicTx';
 import { contextEnv } from '../../src/constants';
-<<<<<<< HEAD
-=======
 
 /**
  * @description - serializes the buffer data
  * @param bufferData - buffer data
  * @returns returns serialised data
  */
->>>>>>> a69986ab47e55ac44bf11b244ad9d42cba5d1c5e
 export const serialize = (bufferData: Buffer[]) => {
   const serializedData = JSON.stringify(bufferData, (key, value) => {
     if (Buffer.isBuffer(value)) {
@@ -61,12 +58,9 @@ export const compareValues = (a: any, b: any): boolean => {
   return a === b;
 };
 
-<<<<<<< HEAD
-=======
 /**
  * @description - transfers funds from C to P chain
  */
->>>>>>> a69986ab47e55ac44bf11b244ad9d42cba5d1c5e
 export const tranferFundsFromCtoP = async () => {
   try {
     let ctx = contextEnv('.env', 'localflare');

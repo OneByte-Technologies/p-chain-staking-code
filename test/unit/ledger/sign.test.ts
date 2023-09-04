@@ -170,6 +170,9 @@ describe('ledger/sign testcases', () => {
   });
 
   describe('Testcases for sign', () => {
+    afterEach(() => {
+      jest.clearAllMocks();
+    });
     jest.mock('fs');
 
     test('Should sign the transaction', async () => {

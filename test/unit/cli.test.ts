@@ -17,10 +17,7 @@ jest.mock('../../src/output', () => ({
   logInfo: jest.fn(),
   log: jest.fn()
 }));
-<<<<<<< HEAD
-=======
 
->>>>>>> a69986ab47e55ac44bf11b244ad9d42cba5d1c5e
 describe('cli Testcases', () => {
   afterEach(() => {
     jest.clearAllMocks();
