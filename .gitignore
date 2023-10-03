@@ -93,13 +93,12 @@ build/*
 # app-specific
 build
 dist
-proofs
 *.lnk
 *unsignedTx.json
+*unsignedTx
 *signedTx.json
 ctx*.json
 
 # fordefi
 private.pem
 token
-ForDefiTxnFiles/

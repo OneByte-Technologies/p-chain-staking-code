@@ -1,9 +1,8 @@
 import { SignatureRequest } from "@flarenetwork/flarejs/dist/common"
 import { Avalanche } from '@flarenetwork/flarejs'
-import { EVMAPI, KeyChain as EVMKeyChain, } from '@flarenetwork/flarejs/dist/apis/evm'
+import { EVMAPI, KeyChain as EVMKeyChain } from '@flarenetwork/flarejs/dist/apis/evm'
 import { PlatformVMAPI as PVMAPI, KeyChain as PVMKeyChain } from '@flarenetwork/flarejs/dist/apis/platformvm'
-import { NetworkConfig } from './constants/network'
-import { walletConstants } from "./constants/screen"
+import { NetworkConfig } from './config'
 
 export interface Context {
   privkHex?: string
@@ -31,7 +30,6 @@ export interface ContextFile {
   flareAddress?: string
   ethAddress?: string
   vaultId?: string
-  derivationPath?: string
 }
 
 export interface UnsignedTxJson {
@@ -46,8 +44,7 @@ export interface UnsignedTxJson {
 }
 
 export interface SignedTxJson extends UnsignedTxJson {
-  signature: string,
-  isSentToChain?: boolean
+  signature: string
 }
 
 export interface UnsignedWithdrawalTxJson {
@@ -79,86 +76,4 @@ interface WithdrawalTxData {
   to: string
   value: string | bigint
   chainId: number
-}
-
-/**
- * Represents the various constants used by the CLI
- * @interface ScreenConstantsInterface
- */
-export interface ScreenConstantsInterface {
-  [key: string]: string;
-}
-
-/**
- * Represents the properties returned from the "connectWallet" function
- * @interface ConnectWalletInterface
- */
-export interface ConnectWalletInterface {
-  wallet: string;
-  path?: string;
-  network?: string;
-}
-
-/**
- * Represents a derived address from a Ledger device
- * @interface DerivedAddress
- */
-export interface DerivedAddress {
-  ethAddress: string,
-  publicKey: string,
-  balance?: string,
-  derivationPath: string
-}
-
-/**
- * Represents the properties returned from the "getDetailsForDelegation" function
- * @interface DelegationDetailsInterface
- */
-export interface DelegationDetailsInterface {
-  amount: string,
-  nodeId: string,
-  startTime: string,
-  endTime: string
-  delegationFee?: string
-}
-
-/**
- * Represents the wallet params sent to the registerAddress Function
- * @interface RegisterAddressInterface
- */
-export interface RegisterAddressInterface {
-  publicKey: string,
-  pAddress: string,
-  cAddress: string,
-  network: string,
-  wallet: keyof typeof walletConstants,
-  derivationPath?: string
-  pvtKey?: string
-  transactionId?: string
-}
-
-/**
- * Represents the wallet params sent to the claimRewards Function
- * @interface ClaimRewardsInterface
- */
-export interface ClaimRewardsInterface {
-  claimAmount: string,
-  ownerAddress: string,
-  receiverAddress: string,
-  network: string,
-  wallet: keyof typeof walletConstants,
-  derivationPath?: string
-  pvtKey?: string
-  transactionId?: string
-}
-
-/**
- * Represents constant used to store values for contract addresses
- * @interface ContractAddressesInterface
- */
-export interface ContractAddressesInterface {
-  [contractName: string]: {
-    flare: string;
-    costwo: string;
-  }
 }
