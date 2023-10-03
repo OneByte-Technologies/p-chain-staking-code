@@ -7,14 +7,14 @@
     "outDir": "dist",
     "rootDir": "./",
     "strict": true,
-    "preserveSymlinks": true,
-    "resolveJsonModule": true
+    "preserveSymlinks": true
   },
   "exclude": [
     "node_modules",
     "scripts",
+    "cli",
     "test",
     "dist",
-    "go-localflare"
+    "staking"
   ]
 }

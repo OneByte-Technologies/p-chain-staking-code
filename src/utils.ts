@@ -1,19 +1,20 @@
-import fs from 'fs'
 import * as ethutil from 'ethereumjs-util'
 import * as elliptic from "elliptic"
+import fs from 'fs'
+import readline from 'readline'
 import { bech32 } from 'bech32'
 import { BN } from '@flarenetwork/flarejs/dist'
 import { UnixNow } from '@flarenetwork/flarejs/dist/utils'
 import { EcdsaSignature } from "@flarenetwork/flarejs/dist/common"
 import { UnsignedTx as EvmUnsignedTx, UTXOSet } from '@flarenetwork/flarejs/dist/apis/evm'
 import { UnsignedTx as PvmUnsignedTx } from '@flarenetwork/flarejs/dist/apis/platformvm'
-import { SignedTxJson, UnsignedTxJson, ContextFile, Context } from './interfaces'
-import { forDefiDirectory, forDefiSignedTxnDirectory, forDefiUnsignedTxnDirectory } from './constants/forDefi'
+import { SignedTxJson, UnsignedTxJson, UnsignedWithdrawalTxJson, SignedWithdrawalTxJson, ContextFile } from './interfaces'
 
 //////////////////////////////////////////////////////////////////////////////////////////
 // public keys and bech32 addresses
 
-const ec: elliptic.ec = new elliptic.ec("secp256k1")
+const EC: typeof elliptic.ec = elliptic.ec
+const ec: elliptic.ec = new EC("secp256k1")
 
 export function privateKeyToEncodedPublicKey(privateKey: string, compress: boolean = true): string {
   const keyPair = ec.keyFromPrivate(privateKey)
@@ -44,10 +45,10 @@ export function compressPublicKey(x: Buffer, y: Buffer): Buffer {
       x: x.toString('hex'),
       y: y.toString('hex')
     }).getPublic().encode("hex", true),
-    "hex")
+  "hex")
 }
 
-export function publicKeyToBech32AddressBuffer(x: Buffer, y: Buffer) {
+function publicKeyToBech32AddressBuffer(x: Buffer, y: Buffer) {
   const compressed = compressPublicKey(x, y)
   return ethutil.ripemd160(ethutil.sha256(compressed), false)
 }
@@ -78,15 +79,15 @@ export function validatePublicKey(publicKey: string): boolean {
 // signatures
 
 export function recoverMessageSigner(message: Buffer, signature: string) {
-  const messageHash = ethutil.hashPersonalMessage(message)
-  return recoverTransactionSigner(messageHash, signature)
+    const messageHash = ethutil.hashPersonalMessage(message)
+    return recoverTransactionSigner(messageHash, signature)
 }
 
 export function recoverTransactionSigner(message: Buffer, signature: string) {
-  let split = ethutil.fromRpcSig(signature)
-  let publicKey = ethutil.ecrecover(message, split.v, split.r, split.s)
-  let signer = ethutil.pubToAddress(publicKey).toString("hex")
-  return signer
+    let split = ethutil.fromRpcSig(signature);
+    let publicKey = ethutil.ecrecover(message, split.v, split.r, split.s);
+    let signer = ethutil.pubToAddress(publicKey).toString("hex");
+    return signer;
 }
 
 export function recoverPublicKey(message: Buffer, signature: string): Buffer {
@@ -115,6 +116,19 @@ export async function sleepms(milliseconds: number) {
   })
 }
 
+export function getUserInput(prompt: string): Promise<string> {
+  const reader = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout
+  })
+  return new Promise((resolve) => {
+    reader.question(prompt, (answer) => {
+      reader.close();
+      resolve(answer);
+    })
+  })
+}
+
 export function unPrefix0x(tx: string) {
   if (!tx) {
     return '0x0'
@@ -123,9 +137,6 @@ export function unPrefix0x(tx: string) {
 }
 
 export function prefix0x(hexString: string) {
-  if (!hexString) {
-    return '0x0'
-  }
   return hexString.startsWith("0x") ? hexString : "0x" + unPrefix0x(hexString)
 }
 
@@ -133,7 +144,7 @@ export function decimalToInteger(dec: string, offset: number): string {
   let ret = dec
   if (ret.includes('.')) {
     const split = ret.split('.')
-    ret = split[0] + split[1].slice(0, offset).padEnd(offset, '0')
+    ret = split[0] + split[1].slice(0,offset).padEnd(offset,'0')
   } else {
     ret = ret + '0'.repeat(offset)
   }
@@ -141,11 +152,8 @@ export function decimalToInteger(dec: string, offset: number): string {
 }
 
 export function integerToDecimal(int: string, offset: number): string {
-  if (int === '0') {
-    return '0'
-  }
   int = int.padStart(offset, '0')
-  const part1 = int.slice(0, -offset)
+  const part1 = int.slice(0,-offset)
   const part2 = int.slice(-offset)
   return part1 + '.' + part2
 }
@@ -167,8 +175,8 @@ export function serializeExportCP_args(args: [BN, string, string, string, string
 }
 
 export function deserializeExportCP_args(serargs: string): [BN, string, string, string, string, string[], number, BN, number, BN?] {
-  const args = JSON.parse(serargs)
-  ;[0, 7, 9].map(i => args[i] = new BN(args[i], 16))
+  const args = JSON.parse(serargs);
+  [0,7,9].map(i => args[i] = new BN(args[i], 16))
   return args
 }
 
@@ -177,7 +185,7 @@ export function serializeImportPC_args(args: [UTXOSet, string, string[], string,
 }
 
 export function deserializeImportPC_args(serargs: string): [UTXOSet, string, string[], string, string[], BN] {
-  const args = JSON.parse(serargs)
+  const args = JSON.parse(serargs);
   const utxoSet = new UTXOSet()
   utxoSet.deserialize(args[0])
   args[0] = utxoSet
@@ -207,30 +215,28 @@ export function initCtxJson(contextFile: ContextFile) {
   fs.writeFileSync('ctx.json', JSON.stringify(contextFile, null, 2))
 }
 
-export function saveUnsignedTxJson(unsignedTxJson: UnsignedTxJson, id: string, dir?: string): void {
-  if (dir === undefined) dir = `${forDefiDirectory}/${forDefiUnsignedTxnDirectory}`
-  fs.mkdirSync(dir, { recursive: true })
-  const fname = `${dir}/${id}.unsignedTx.json`
+export function saveUnsignedTxJson(unsignedTxJson: UnsignedTxJson, id: string): void {
+  const fname = `${id}.unsignedTx.json`
   if (fs.existsSync(fname)) {
     throw new Error(`unsignedTx file ${fname} already exists`)
-  }
+}
   const forDefiHash = Buffer.from(unsignedTxJson.signatureRequests[0].message, 'hex').toString('base64')
-  const unsignedTxJsonForDefi: UnsignedTxJson = { ...unsignedTxJson, forDefiHash: forDefiHash }
+  const unsignedTxJsonForDefi: UnsignedTxJson = {...unsignedTxJson, forDefiHash: forDefiHash }
   const serialization = JSON.stringify(unsignedTxJsonForDefi, null, 2)
   fs.writeFileSync(fname, serialization)
 }
 
 export function readUnsignedTxJson(id: string): UnsignedTxJson {
-  const fname = `${forDefiDirectory}/${forDefiUnsignedTxnDirectory}/${id}.unsignedTx.json`
+  const fname = `${id}.unsignedTx.json`
   if (!fs.existsSync(fname)) {
     throw new Error(`unsignedTx file ${fname} does not exist`)
   }
-  const serialization = fs.readFileSync(fname, 'utf-8').toString()
+  const serialization = fs.readFileSync(fname).toString()
   return JSON.parse(serialization) as UnsignedTxJson
 }
 
 export function readSignedTxJson(id: string): SignedTxJson {
-  const fname = `${forDefiDirectory}/${forDefiSignedTxnDirectory}/${id}.signedTx.json`
+  const fname = `${id}.signedTx.json`
   if (!fs.existsSync(fname)) {
     throw new Error(`signedTx file ${fname} does not exist`)
   }
@@ -242,65 +248,59 @@ export function readSignedTxJson(id: string): SignedTxJson {
   return resp
 }
 
-/**
- * @description Adds a flag to the signed txn to indicate it has been submitted to the blockchain
- * @param {string} id Transaction Id used to create the transaction file
- */
-export function addFlagForSentSignedTx(id: string) {
-  const fname = `${forDefiDirectory}/${forDefiSignedTxnDirectory}/${id}.signedTx.json`
+// withdrawal
+export function saveUnsignedWithdrawalTx(unsignedTx: UnsignedWithdrawalTxJson, id: string): void {
+  const fname = `${id}.unsignedTx.json`
+  if (fs.existsSync(fname)) {
+    throw new Error(`unsignedTx file ${fname} already exists`)
+}
+  const serialization = JSON.stringify(unsignedTx, null, 2)
+  fs.writeFileSync(fname, serialization)
+}
+
+export function readUnsignedWithdrawalTx(id: string): UnsignedWithdrawalTxJson {
+  const fname = `${id}.unsignedTx.json`
+  if (!fs.existsSync(fname)) {
+    throw new Error(`unsignedTx file ${fname} does not exist`)
+  }
+  const serialization = fs.readFileSync(fname).toString()
+  return JSON.parse(serialization) as UnsignedWithdrawalTxJson
+}
+
+export function readSignedWithdrawalTx(id: string): SignedWithdrawalTxJson {
+  const fname = `${id}.signedTx.json`
   if (!fs.existsSync(fname)) {
     throw new Error(`signedTx file ${fname} does not exist`)
   }
   const serialization = fs.readFileSync(fname).toString()
-  const txObj = JSON.parse(serialization) as SignedTxJson
-  txObj.isSentToChain = true
-
-  fs.writeFileSync(`${forDefiDirectory}/${forDefiSignedTxnDirectory}/${id}.signedTx.json`, JSON.stringify(txObj), "utf8")
-}
-
-/**
- * @description Checks whether the transaction has already been submitted to the blockchain
- * @param {string} id Transaction Id used to create the transaction file
- * @returns {boolean}
- */
-export function isAlreadySentToChain(id: string): boolean {
-  const fname = `${forDefiDirectory}/${forDefiSignedTxnDirectory}/${id}.signedTx.json`
-  if (!fs.existsSync(fname)) {
-    return false
+  const resp = JSON.parse(serialization) as SignedWithdrawalTxJson
+  if (!resp.signature) {
+    throw new Error(`unsignedTx file ${fname} does not contain signature`)
   }
-  const serialization = fs.readFileSync(fname).toString()
-  const txObj = JSON.parse(serialization) as SignedTxJson
-
-  return txObj.isSentToChain ? true : false
+  return resp
 }
 
 
-function countpAddressInDelegation(validators: any[], pAddressBech32: string): number {
-  let count = 0
-  for (const item of validators) {
-    if (item.delegators) {
-      for (const delegator of item.delegators) {
-        count += delegator.rewardOwner.addresses.filter((addr: string) => {
-          return addr.toLowerCase() === pAddressBech32.toLowerCase()
-        }).length
+
+///////////
+export function waitFinalize3Factory(web3: any) {
+  return async function (address: string, func: () => any, delay: number = 1000) {
+      let totalDelay = 0;
+      let nonce = await web3.eth.getTransactionCount(address)
+      let res = await func();
+      let backoff = 1.5;
+      let cnt = 0;
+      while ((await web3.eth.getTransactionCount(address)) == nonce) {
+          await new Promise((resolve: any) => { setTimeout(() => { resolve() }, delay) })
+          if (cnt < 8) {
+              totalDelay += delay;
+              delay = Math.floor(delay * backoff);
+              cnt++;
+          } else {
+              throw new Error(`Response timeout after ${totalDelay}ms`);
+          }
+          console.log(`Delay backoff ${delay} (${cnt})`);
       }
-    }
+      return res;
   }
-  return count
-}
-
-/**
- * @description Count number of p-chain address used for delegation
- * @param {Context} ctx context file
- * @returns number of times p address used in current validators delegation list
- */
-export async function delegationAddressCount(ctx: Context) {
-  const current = await ctx.pchain.getCurrentValidators()
-  const pending = await ctx.pchain.getPendingValidators()
-  const pendingValidtaor = JSON.parse(JSON.stringify(pending))
-  const pCurrent = JSON.parse(JSON.stringify(current))
-  const count =
-    countpAddressInDelegation(pCurrent.validators, ctx.pAddressBech32!) +
-    countpAddressInDelegation(pendingValidtaor.validators, ctx.pAddressBech32!)
-  return count
 }
